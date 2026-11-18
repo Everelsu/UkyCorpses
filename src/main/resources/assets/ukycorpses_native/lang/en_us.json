@@ -1,0 +1,8 @@
+{
+  "entity.ukycorpses_native.physics_block": "Physics Block",
+  "death.attack.ukycorpses_native.physics_block": "%1$s was crushed by a physics block",
+  "death.attack.ukycorpses_native.physics_block.player": "%1$s was crushed by a block thrown by %2$s",
+  "key.ukycorpses_native.shift_up": "Shift Up (Vehicle)",
+  "key.ukycorpses_native.shift_down": "Shift Down (Vehicle)",
+  "hud.ukycorpses_native.vehicle": "%s km/h   Gear %s   %s rpm"
+}

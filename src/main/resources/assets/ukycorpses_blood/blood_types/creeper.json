@@ -1,0 +1,6 @@
+{
+  "name": "creeper",
+  "color": "#3E7A2A",
+  "dried": "#1C3313",
+  "entities": ["minecraft:creeper"]
+}

@@ -1,0 +1,290 @@
+{
+  "heart": {
+    "category": "player",
+    "sounds": [
+      {
+        "name": "heart",
+        "stream": false
+      }
+    ]
+  },
+  "breath": {
+    "category": "player",
+    "sounds": [
+      {
+        "name": "breath",
+        "stream": false
+      }
+    ]
+  },
+  "drip_1": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:drip_1",
+        "attenuation_distance": 10
+      }
+    ],
+    "category": "player"
+  },
+  "drip_1_muffled": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:drip_1_muffled",
+        "attenuation_distance": 10
+      }
+    ],
+    "category": "player"
+  },
+  "drip_2": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:drip_2",
+        "attenuation_distance": 10
+      }
+    ],
+    "category": "player"
+  },
+  "drip_2_muffled": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:drip_2_muffled",
+        "attenuation_distance": 10
+      }
+    ],
+    "category": "player"
+  },
+  "drip_3": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:drip_3",
+        "attenuation_distance": 10
+      }
+    ],
+    "category": "player"
+  },
+  "drip_4": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:drip_4",
+        "attenuation_distance": 10
+      }
+    ],
+    "category": "player"
+  },
+  "hit_1": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_1",
+        "attenuation_distance": 20
+      }
+    ],
+    "category": "player"
+  },
+  "hit_2": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_2",
+        "attenuation_distance": 20
+      }
+    ],
+    "category": "player"
+  },
+  "hit_3": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_3",
+        "attenuation_distance": 20
+      }
+    ],
+    "category": "player"
+  },
+  "hit_4": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_4",
+        "attenuation_distance": 20
+      }
+    ],
+    "category": "player"
+  },
+  "hit_5": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_5",
+        "attenuation_distance": 20
+      }
+    ],
+    "category": "player"
+  },
+  "hit_6": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_6",
+        "attenuation_distance": 20
+      }
+    ],
+    "category": "player"
+  },
+  "hit_7": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_7",
+        "attenuation_distance": 20
+      }
+    ],
+    "category": "player"
+  },
+  "hit_8": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_8",
+        "attenuation_distance": 20
+      }
+    ],
+    "category": "player"
+  },
+  "splat_1": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:splat_1",
+        "attenuation_distance": 12
+      }
+    ],
+    "category": "player"
+  },
+  "splat_2": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:splat_2",
+        "attenuation_distance": 12
+      }
+    ],
+    "category": "player"
+  },
+  "splat_3": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:splat_3",
+        "attenuation_distance": 12
+      }
+    ],
+    "category": "player"
+  },
+  "splat_4": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:splat_4",
+        "attenuation_distance": 12
+      }
+    ],
+    "category": "player"
+  },
+  "splat_5": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:splat_5",
+        "attenuation_distance": 12
+      }
+    ],
+    "category": "player"
+  },
+  "splat_6": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:splat_6",
+        "attenuation_distance": 12
+      }
+    ],
+    "category": "player"
+  },
+  "spurt_1": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:spurt_1",
+        "attenuation_distance": 20
+      }
+    ],
+    "category": "player"
+  },
+  "spurt_2": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:spurt_2",
+        "attenuation_distance": 20
+      }
+    ],
+    "category": "player"
+  },
+  "spurt_3": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:spurt_3",
+        "attenuation_distance": 20
+      }
+    ],
+    "category": "player"
+  },
+  "spurt_4": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:spurt_4",
+        "attenuation_distance": 20
+      }
+    ],
+    "category": "player"
+  },
+  "spurt_5": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:spurt_5",
+        "attenuation_distance": 20
+      }
+    ],
+    "category": "player"
+  },
+  "squelch_1": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:squelch_1",
+        "attenuation_distance": 10
+      }
+    ],
+    "category": "player"
+  },
+  "squelch_2": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:squelch_2",
+        "attenuation_distance": 10
+      }
+    ],
+    "category": "player"
+  },
+  "squelch_3": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:squelch_3",
+        "attenuation_distance": 10
+      }
+    ],
+    "category": "player"
+  },
+  "squelch_4": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:squelch_4",
+        "attenuation_distance": 10
+      }
+    ],
+    "category": "player"
+  },
+  "squelch_5": {
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:squelch_5",
+        "attenuation_distance": 10
+      }
+    ],
+    "category": "player"
+  }
+}

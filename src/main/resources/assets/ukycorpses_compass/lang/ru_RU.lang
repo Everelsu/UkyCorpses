@@ -1,0 +1,18 @@
+item.ukycorpses_compass.corpse_compass.name=Компас трупа
+
+item.ukycorpses_compass.corpse_compass.owner=Владелец: %s
+
+item.ukycorpses_compass.corpse_compass.pos=Место смерти: %s, %s, %s
+
+gui.ukycorpses_compass.corpse_compass.title=Труп игрока %s
+
+gui.ukycorpses_compass.corpse_compass.location=Расположение
+
+gui.ukycorpses_compass.corpse_compass.id=ID: %s
+
+gui.ukycorpses_compass.corpse_compass.copied=Команда скопирована
+
+gui.ukycorpses_compass.corpse_compass.copy.tooltip=Нажмите, чтобы скопировать команду возвращения трупа
+
+
+item.ukycorpses_compass.corpse_compass.name=Компас тела

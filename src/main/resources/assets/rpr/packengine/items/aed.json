@@ -1,0 +1,33 @@
+{
+  "id": "aed",
+  "display_name": "AED",
+  "translation_key": "item.ukycorpses_revive.aed",
+  "type": "device",
+  "stack_size": 1,
+  "use_mode": "multiple",
+  "uses": 10,
+  "consume_tick": 0,
+
+  "model": "rpr:geo/item/aed.geo.json",
+  "texture": "rpr:textures/item/aed.png",
+  "animation": "rpr:animations/item/aed.animation.json",
+  "camera_bone": "camera",
+
+  "_comment_flip_arms": "The hand bones are rigged the reverse way round (rest X ~+115 with a ~180 Z roll, where the convention is ~-120 and no roll), so PackEngine's camera-bone arm flip would end-swap the arms.",
+  "flip_arms": false,
+
+  "idle_animation": "idle",
+  "use_animation": "use",
+  "equip_animation": "equip",
+  "unequip_animation": "unequip",
+
+  "extra_animations": [
+    {
+      "name": "charge",
+      "animation": "charge"
+    }
+  ],
+
+  "use_returns_to_equip": false,
+  "cooldown": 0
+}

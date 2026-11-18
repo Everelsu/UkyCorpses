@@ -1,0 +1,6 @@
+{
+  "name": "squid",
+  "color": "#2B4FA8",
+  "dried": "#14224A",
+  "entities": ["minecraft:squid", "minecraft:glow_squid"]
+}

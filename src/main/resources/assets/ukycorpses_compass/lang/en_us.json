@@ -1,0 +1,23 @@
+{
+    "entity.ukycorpses_compass.corpse": "Corpse",
+    "item.ukycorpses_compass.corpse_compass": "Corpse Compass",
+    "item.ukycorpses_compass.corpse_compass.owner": "Owner: %s",
+    "item.ukycorpses_compass.corpse_compass.pos": "Corpse: %s, %s, %s",
+    "gui.ukycorpses_compass.corpse_compass.title": "%s's Corpse",
+    "gui.ukycorpses_compass.corpse_compass.location": "Location",
+    "gui.ukycorpses_compass.corpse_compass.id": "Corpse ID: %s",
+    "gui.ukycorpses_compass.corpse_compass.copy": "Copy retrieve command",
+    "gui.ukycorpses_compass.corpse_compass.copy.tooltip": "Corpse ID/Recovery",
+    "gui.ukycorpses_compass.corpse_compass.copied": "Copied to clipboard!",
+    "message.ukycorpses_compass.corpse.not_yours": "This body is not yours to search.",
+    "ukycorpses_compass.configuration.corpse": "Corpse Settings",
+    "ukycorpses_compass.configuration.corpse.enableCorpses": "Enable Corpses",
+    "ukycorpses_compass.configuration.corpse.corpseExpiryTicks": "Corpse Expiry (ticks)",
+    "ukycorpses_compass.configuration.corpse.corpseSettleTimeoutTicks": "Corpse Settle Timeout (ticks)",
+    "ukycorpses_compass.configuration.corpse.corpseStoreXp": "Corpse Store XP",
+    "ukycorpses_compass.configuration.corpse.enableCorpseCompass": "Enable Corpse Compass",
+    "ukycorpses_compass.configuration.corpse.removeCompassWhenLooted": "Remove Compass When Looted",
+    "ukycorpses_compass.configuration.corpse.corpseSkeletonTicks": "Corpse Skeleton (ticks)",
+    "ukycorpses_compass.configuration.corpse.ownerOnlyLooting": "Owner Only Looting",
+    "ukycorpses_compass.configuration.corpse.othersLootWhenSkeletal": "Others Loot When Skeletal"
+}

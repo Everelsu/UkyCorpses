@@ -1,0 +1,272 @@
+{
+  "drip_1": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.drip",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:drip_1",
+        "attenuation_distance": 10
+      }
+    ]
+  },
+  "drip_1_muffled": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.drip",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:drip_1_muffled",
+        "attenuation_distance": 10
+      }
+    ]
+  },
+  "drip_2": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.drip",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:drip_2",
+        "attenuation_distance": 10
+      }
+    ]
+  },
+  "drip_2_muffled": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.drip",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:drip_2_muffled",
+        "attenuation_distance": 10
+      }
+    ]
+  },
+  "drip_3": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.drip",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:drip_3",
+        "attenuation_distance": 10
+      }
+    ]
+  },
+  "drip_4": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.drip",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:drip_4",
+        "attenuation_distance": 10
+      }
+    ]
+  },
+  "hit_1": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.hit",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_1",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "hit_2": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.hit",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "hit_3": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.hit",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_3",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "hit_4": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.hit",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_4",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "hit_5": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.hit",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_5",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "hit_6": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.hit",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_6",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "hit_7": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.hit",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_7",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "hit_8": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.hit",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:hit_8",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "splat_1": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.splat",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:splat_1",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "splat_2": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.splat",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:splat_2",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "splat_3": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.splat",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:splat_3",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "splat_4": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.splat",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:splat_4",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "splat_5": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.splat",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:splat_5",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "splat_6": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.splat",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:splat_6",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "spurt_1": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.spurt",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:spurt_1",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "spurt_2": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.spurt",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:spurt_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "spurt_3": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.spurt",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:spurt_3",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "spurt_4": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.spurt",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:spurt_4",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "spurt_5": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.spurt",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:spurt_5",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "squelch_1": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.step",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:squelch_1",
+        "attenuation_distance": 10
+      }
+    ]
+  },
+  "squelch_2": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.step",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:squelch_2",
+        "attenuation_distance": 10
+      }
+    ]
+  },
+  "squelch_3": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.step",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:squelch_3",
+        "attenuation_distance": 10
+      }
+    ]
+  },
+  "squelch_4": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.step",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:squelch_4",
+        "attenuation_distance": 10
+      }
+    ]
+  },
+  "squelch_5": {
+    "subtitle": "subtitles.ukycorpses_blood.blood.step",
+    "sounds": [
+      {
+        "name": "ukycorpses_blood:squelch_5",
+        "attenuation_distance": 10
+      }
+    ]
+  }
+}

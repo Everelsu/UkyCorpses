@@ -1,0 +1,6 @@
+{
+  "name": "sculk",
+  "color": "#0F3B40",
+  "dried": "#06171A",
+  "entities": ["minecraft:warden"]
+}

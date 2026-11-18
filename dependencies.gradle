@@ -1,0 +1,15 @@
+dependencies {
+    compileOnly(files("libs/joltjni-local.jar"))
+    shadowImplementation("cz.advel.jbullet:jbullet:20101010-1") { transitive = false }
+    shadowImplementation("javax.vecmath:vecmath:1.5.2")
+    // Waila is optional at runtime: WailaCompat is only touched through IMC when Waila is loaded
+    compileOnly("com.github.GTNewHorizons:waila:1.8.14:dev") { transitive = false }
+}
+
+// Native JNI entry points require the original jolt-jni class names.
+afterEvaluate {
+    tasks.named("shadowJar") {
+        relocate("com.bulletphysics", "com.uky.corpses.shadow.com.bulletphysics")
+        relocate("javax.vecmath", "com.uky.corpses.shadow.javax.vecmath")
+    }
+}

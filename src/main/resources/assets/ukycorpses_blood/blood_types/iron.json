@@ -1,0 +1,7 @@
+{
+  "name": "iron",
+  "color": "#4E4B47",
+  "dried": "#6A6560",
+  "flows": false,
+  "entities": ["minecraft:iron_golem"]
+}

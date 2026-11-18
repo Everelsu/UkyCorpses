@@ -1,0 +1,6 @@
+{
+  "name": "ender",
+  "color": "#5A1A7A",
+  "dried": "#220A30",
+  "entities": ["minecraft:enderman", "minecraft:endermite"]
+}

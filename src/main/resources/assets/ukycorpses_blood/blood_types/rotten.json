@@ -1,0 +1,10 @@
+{
+  "name": "rotten",
+  "color": "#64201A",
+  "dried": "#3D1710",
+  "amount": 0.7,
+  "entities": [
+    "minecraft:zombie", "minecraft:husk", "minecraft:drowned", "minecraft:zombie_villager",
+    "minecraft:zombified_piglin", "minecraft:zoglin", "minecraft:zombie_horse", "minecraft:giant"
+  ]
+}

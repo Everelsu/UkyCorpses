@@ -1,0 +1,6 @@
+{
+  "name": "magma",
+  "color": "#D2500E",
+  "dried": "#3A1405",
+  "entities": ["minecraft:magma_cube", "minecraft:strider"]
+}

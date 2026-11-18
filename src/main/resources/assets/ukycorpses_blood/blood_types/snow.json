@@ -1,0 +1,7 @@
+{
+  "name": "snow",
+  "color": "#EEF4F7",
+  "dried": "#C9D4DA",
+  "flows": false,
+  "entities": ["minecraft:snow_golem"]
+}

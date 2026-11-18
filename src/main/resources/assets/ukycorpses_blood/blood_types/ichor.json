@@ -1,0 +1,8 @@
+{
+  "name": "ichor",
+  "color": "#7A8A1E",
+  "dried": "#3A3F12",
+  "entities": [
+    "minecraft:spider", "minecraft:cave_spider", "minecraft:silverfish", "minecraft:bee"
+  ]
+}

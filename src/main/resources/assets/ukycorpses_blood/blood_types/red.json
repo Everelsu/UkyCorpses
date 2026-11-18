@@ -1,0 +1,17 @@
+{
+  "name": "red",
+  "color": "#8E1111",
+  "dried": "#4E140E",
+  "entities": [
+    "minecraft:player", "minecraft:villager", "minecraft:wandering_trader", "minecraft:pillager",
+    "minecraft:vindicator", "minecraft:evoker", "minecraft:illusioner", "minecraft:witch", "minecraft:ravager",
+    "minecraft:piglin", "minecraft:piglin_brute", "minecraft:hoglin", "minecraft:cow", "minecraft:pig",
+    "minecraft:sheep", "minecraft:chicken", "minecraft:horse", "minecraft:donkey", "minecraft:mule",
+    "minecraft:llama", "minecraft:trader_llama", "minecraft:wolf", "minecraft:cat", "minecraft:ocelot",
+    "minecraft:fox", "minecraft:rabbit", "minecraft:polar_bear", "minecraft:panda", "minecraft:goat",
+    "minecraft:camel", "minecraft:sniffer", "minecraft:mooshroom", "minecraft:bat", "minecraft:parrot",
+    "minecraft:dolphin", "minecraft:turtle", "minecraft:cod", "minecraft:salmon", "minecraft:pufferfish",
+    "minecraft:tropical_fish", "minecraft:guardian", "minecraft:elder_guardian",
+    "minecraft:axolotl", "minecraft:frog", "minecraft:tadpole", "minecraft:ghast", "minecraft:ender_dragon"
+  ]
+}

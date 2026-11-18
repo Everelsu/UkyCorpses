@@ -1,0 +1,7 @@
+{
+  "format_version": 1,
+  "name": "UkyCorpses Revival",
+  "description": "First-person medical device animations shipped inside the UkyCorpses Revival jar.",
+  "version": "1.0",
+  "required_mods": ["ukycorpses_revive"]
+}

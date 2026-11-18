@@ -1,0 +1,12 @@
+{
+  "heartbeat": {
+    "category": "player",
+    "subtitle": "subtitles.ukycorpses_revive.heartbeat",
+    "sounds": [
+      {
+        "name": "ukycorpses_revive:heartbeat",
+        "stream": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "phantom",
+  "color": "#4A5A6E",
+  "dried": "#1E242C",
+  "amount": 0.6,
+  "entities": ["minecraft:phantom"]
+}
