@@ -1,0 +1,4 @@
+dependencies {
+    // Waila is optional at runtime: WailaCompat is only touched through IMC when Waila is loaded
+    compileOnly("com.github.GTNewHorizons:waila:1.8.14:dev") { transitive = false }
+}

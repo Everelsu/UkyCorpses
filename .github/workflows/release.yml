@@ -1,0 +1,117 @@
+# One tag, one release: the jar built from the tagged commit, on GitHub, and on Modrinth and CurseForge where those are
+# set up. See RELEASING.md.
+#
+# A store is published to only when both halves of it are there: its project id in gradle.properties and its token
+# in the repository's secrets. Missing either, it is skipped, not failed: a fork, or a mod not on that store yet,
+# still gets its GitHub release.
+name: Release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-pre*'
+  # By hand, from the Actions tab: pick the tag under "Use workflow from", and tick where it goes. With nothing ticked
+  # it only builds, and the jar is left as a workflow artifact: the way to rehearse.
+  workflow_dispatch:
+    inputs:
+      github:
+        description: GitHub release
+        type: boolean
+        default: true
+      modrinth:
+        description: Modrinth
+        type: boolean
+        default: true
+      curseforge:
+        description: CurseForge
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+      CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the version is the tag: the build has to see it
+
+      - name: The version is a tag
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-pre[0-9A-Za-z.]*)?$ ]]; then
+            echo "::error::Run this from a version tag (1.2.3 or 1.2.3-pre1), not from '$VERSION'."
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          if [[ "$VERSION" == *-pre* ]]; then echo "PRERELEASE=true" >> "$GITHUB_ENV"; else echo "PRERELEASE=false" >> "$GITHUB_ENV"; fi
+
+      - name: This version's notes, out of CHANGELOG.md
+        run: |
+          # From "## <version>" to the next "## ": what the stores and the GitHub release show.
+          awk -v v="$VERSION" '
+            $0 ~ "^## " { if (on) exit; if ($2 == v) { on = 1; next } }
+            on { print }
+          ' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          if ! grep -q '[^[:space:]]' "$RUNNER_TEMP/notes.md"; then
+            echo "::error::CHANGELOG.md has no '## $VERSION' section. Write it before tagging."
+            exit 1
+          fi
+          echo "CHANGELOG_FILE=$RUNNER_TEMP/notes.md" >> "$GITHUB_ENV"
+          cat "$RUNNER_TEMP/notes.md"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build
+        run: |
+          chmod +x gradlew
+          ./gradlew build --no-daemon
+          JAR="build/libs/ukycorpses-${VERSION}.jar"
+          test -f "$JAR" || { echo "::error::$JAR was not built (is the tag on a clean commit?)"; ls build/libs; exit 1; }
+          echo "JAR=$JAR" >> "$GITHUB_ENV"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ukycorpses-${{ env.VERSION }}
+          path: ${{ env.JAR }}
+
+      - name: Modrinth
+        if: github.event_name == 'push' || inputs.modrinth
+        run: |
+          id=$(grep -E '^modrinthProjectId *=' gradle.properties | cut -d= -f2- | tr -d ' ')
+          if [ -z "$id" ] || [ -z "$MODRINTH_TOKEN" ]; then
+            echo "Skipped: modrinthProjectId in gradle.properties and the MODRINTH_TOKEN secret are both needed."
+            exit 0
+          fi
+          ./gradlew modrinth --no-daemon
+
+      - name: CurseForge
+        if: github.event_name == 'push' || inputs.curseforge
+        run: |
+          id=$(grep -E '^curseForgeProjectId *=' gradle.properties | cut -d= -f2- | tr -d ' ')
+          if [ -z "$id" ] || [ -z "$CURSEFORGE_TOKEN" ]; then
+            echo "Skipped: curseForgeProjectId in gradle.properties and the CURSEFORGE_TOKEN secret are both needed."
+            exit 0
+          fi
+          ./gradlew publishCurseforge --no-daemon
+
+      - name: GitHub release
+        if: github.event_name == 'push' || inputs.github
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: UkyCorpses ${{ env.VERSION }}
+          body_path: ${{ env.CHANGELOG_FILE }}
+          prerelease: ${{ env.PRERELEASE }}
+          files: ${{ env.JAR }}

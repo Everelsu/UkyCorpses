@@ -1,0 +1,4 @@
+{
+  "heart": { "category": "player", "sounds": [ { "name": "heart", "stream": false } ] },
+  "breath": { "category": "player", "sounds": [ { "name": "breath", "stream": false } ] }
+}
