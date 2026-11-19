@@ -52,7 +52,6 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -84,15 +83,11 @@ public class UkyCorpses {
     public static final Queue<Runnable> serverTasks = new ConcurrentLinkedQueue<>();
     /** Inventory as it was at the moment of death, before drops lose their slots. */
     private final Map<UUID, Snapshot> pending = new HashMap<>();
-    // ponytail: tapes waiting for respawn live in memory; a server restart between death and respawn loses the tape
-    // (never the items)
-    private final Map<UUID, ItemStack> tapes = new HashMap<>();
 
     private static final class Snapshot {
 
         final Map<ItemStack, Integer> slots = new IdentityHashMap<>();
         int xp;
-        IChatComponent cause;
         double[] spot;
         boolean burnt;
         DamageSource source;
@@ -209,7 +204,6 @@ public class UkyCorpses {
         s.kick = DeathMotion.explosionKick(p, s.blast);
         s.yaw = p.renderYawOffset;
         s.held = p.inventory.currentItem; // the inventory is wiped by the time the drops event comes
-        s.cause = event.source.func_151519_b(p);
         // XP goes into the body instead of orbs: at level 0 vanilla's getExperiencePoints() drops nothing
         if (OriginalGameplay.corpseStoreXp) {
             p.experienceLevel = 0;
@@ -290,11 +284,6 @@ public class UkyCorpses {
         net.sendTo(
             new MsgCorpse(x, y, z, dim, number, entries.size(), levels(xp), lost.size(), CorpseConfig.ownerLockMinutes),
             player);
-        if (CorpseConfig.tape) {
-            List<ItemStack> kept = new ArrayList<>();
-            for (EntityCorpse.Entry e : entries) kept.add(e.stack);
-            tapes.put(player.getUniqueID(), ItemTape.create(body, dim, number, snap.cause, kept, lost));
-        }
         LOG.info(
             "Body #{} of {} ({} stacks, {} lost, {} xp) at {} {} {} dim {}",
             number,
@@ -472,13 +461,6 @@ public class UkyCorpses {
     public void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         for (Runnable r; (r = serverTasks.poll()) != null;) r.run();
-    }
-
-    @SubscribeEvent
-    public void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
-        ItemStack t = tapes.remove(event.player.getUniqueID());
-        if (t != null && !event.player.inventory.addItemStackToInventory(t))
-            event.player.dropPlayerItemWithRandomChoice(t, false);
     }
 
     /** Yaw snapped to 0..3, a quarter turn each, 0 = facing +z. */

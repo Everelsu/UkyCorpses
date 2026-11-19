@@ -37,7 +37,6 @@ public final class ConfigGui extends GuiConfig {
         "reactions",
         "physics",
         "dismemberment",
-        "deathcam",
         "movement",
         "penalty",
         "legacy");

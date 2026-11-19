@@ -20,7 +20,6 @@ public final class CorpseConfig {
 
     public static int ownerLockMinutes;
     public static boolean restoreSlots;
-    public static boolean tape, tapeGone;
     /** Seconds anyone but the owner holds right-click to search a body; blows that break one apart. */
     public static int searchSeconds, breakBlows;
     /** Sneak-right-click drags an entity body; a broken body leaves bones (and flesh). */
@@ -79,32 +78,10 @@ public final class CorpseConfig {
         Reactions.config(c);
         com.uky.corpses.stains.SurfaceBlood.config(c);
 
-        Section access = section("corpse.access", "Кто и как открывает тело.");
-        ownerLockMinutes = access.num(
-            "ownerLockMinutes",
-            15,
-            -1,
-            100000,
-            "Сколько минут тело открывает только владелец (и креатив). 0 — сразу всем, -1 — только владелец, навсегда.");
-        searchSeconds = access.num(
-            "searchSeconds",
-            4,
-            0,
-            60,
-            "Сколько секунд идёт обыск чужого тела после клика (не отходи). 0 — сразу.");
-        restoreSlots = access
-            .on("restoreSlots", true, "Владелец получает вещи в те же слоты: броня надета, хотбар как был.");
-
         Section handling = section("corpse.handling", "Что можно делать с телом руками.");
-        drag = handling
-            .on("drag", true, "Shift+ПКМ по телу — тащишь, пока держишь Shift. Тело-блок становится сущностью.");
         breakBlows = handling.num("breakBlows", 6, 1, 100, "Сколько ударов разбивают тело (меч или топор — за два).");
         bones = handling.on("bones", true, "Разбитое тело оставляет кости.");
         flesh = handling.on("flesh", true, "Разбитое тело оставляет гнилую плоть (у обгоревшего её нет).");
-
-        Section tapes = section("corpse.tape", "Кассета: запись смерти с причиной, координатами и списком вещей.");
-        tape = tapes.on("enabled", true, "Выдавать кассету после возрождения.");
-        tapeGone = tapes.on("goneWhenTaken", true, "Кассета исчезает, когда владелец забрал из тела всё.");
 
         Section penalty = section(
             "penalty",
@@ -159,7 +136,6 @@ public final class CorpseConfig {
         reviveHealth = revive.num("health", 6, 1, 20, "Здоровье после подъёма, в половинках сердца.");
         com.uky.corpses.medicine.Medicine.shockAfterRevive = revive.on("shockAfter", true, "После подъёма — шок.");
 
-        com.uky.corpses.deathcam.DeathCam.config(c);
         com.uky.corpses.medicine.Medicine.config(c);
         com.uky.corpses.blood.Blood.config(c);
         com.uky.corpses.movement.Crouch.config(c);

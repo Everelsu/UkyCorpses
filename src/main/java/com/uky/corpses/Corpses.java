@@ -28,21 +28,10 @@ public final class Corpses {
 
     public static void config(Configuration c) {
         cfg = c;
-        CorpseConfig.Section s = CorpseConfig.section("corpse", "Тела погибших игроков: что остаётся после смерти.");
-        enabledProp = s.prop(
-            "enabled",
-            true,
-            "Главный выключатель тел. false — смерть как в ванили, вещи выпадают на землю. Также /corpses on|off.");
+        CorpseConfig.Section s = CorpseConfig.section("corpse.rules", "Тела игроков.");
+        enabledProp = s
+            .prop("enableCorpses", true, "Оставлять тело игрока с вещами после смерти. Также /ukycorpses on|off.");
         enabled = enabledProp.getBoolean();
-        asBlock = false;
-        c.get("corpse", "asBlock", false)
-            .set(false);
-        despawnTicks = 20L
-            * s.num("despawnSeconds", 0, 0, 100000000, "Через сколько секунд тело исчезает. 0 — никогда.");
-        dropOnDespawn = s
-            .on("dropItemsOnDespawn", true, "Тело исчезло — вещи и опыт падают на землю. false — пропадают.");
-        keepEmpty = s
-            .on("keepEmpty", true, "Пустое тело лежит, пока его не разобьют. false — исчезает, когда его закрыли.");
     }
 
     public static void init() {}

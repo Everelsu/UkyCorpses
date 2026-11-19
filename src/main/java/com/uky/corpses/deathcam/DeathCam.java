@@ -1,7 +1,5 @@
 package com.uky.corpses.deathcam;
 
-import net.minecraftforge.common.config.Configuration;
-
 /** Death camera. Common side holds only config; everything else is in DeathCamClient. */
 public final class DeathCam {
 
@@ -21,17 +19,6 @@ public final class DeathCam {
     public static boolean muffle = true;
     /** Sight blurs and greys a little (a vanilla post shader). */
     public static boolean blur = true;
-
-    public static void config(Configuration c) {
-        enabled = autoRespawn = quotes = muffle = blur = false;
-        seconds = 0;
-        c.get("deathcam", "enabled", false)
-            .set(false);
-        c.get("deathcam", "clickToRespawn", false)
-            .set(false);
-        c.get("deathcam", "autoRespawnSeconds", 0)
-            .set(0);
-    }
 
     public static void preInit() {}
 }

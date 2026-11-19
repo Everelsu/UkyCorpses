@@ -56,6 +56,22 @@ public final class LegacyConfigCheck {
             assert java.util.Arrays
                 .equals(original, Files.readAllBytes(folder.resolve("corpses.cfg.before-layout.bak")));
             assert !LegacyConfig.migrate(config) : "new blood section was remigrated as legacy";
+            config.get("corpse.tape", "enabled", true);
+            config.get("deathcam", "enabled", false);
+            config.get("corpse", "asBlock", false);
+            config.get("corpse.rules", "enableCorpseCompass", true)
+                .set(false);
+            config.get("corpse.performance", "mobRagdolls", true)
+                .set(false);
+            LegacyConfig.discardUnused(config);
+            config.save();
+            config = new Configuration(file.toFile());
+            assert !config.hasCategory("corpse.tape") && !config.hasCategory("deathcam")
+                && !config.hasKey("corpse", "asBlock");
+            assert !config.get("corpse.rules", "enableCorpseCompass", true)
+                .getBoolean();
+            assert !config.get("corpse.performance", "mobRagdolls", true)
+                .getBoolean();
             assert !LegacyConfig.comment("Cruor cruor:hit_1 / Ragdollified Reactions 0.1.3")
                 .toLowerCase()
                 .matches(".*(cruor|ragdollified).*");

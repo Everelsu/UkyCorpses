@@ -18,9 +18,9 @@ import cpw.mods.fml.relauncher.Side;
 /** Installed Corpse storage and Revival settings, using the monolith's Forge configuration. */
 public final class OriginalGameplay {
 
-    public static boolean enableCorpses = true, corpseStoreXp = true, enableCorpseCompass = true,
-        removeCompassWhenLooted = true, ownerOnlyLooting, othersLootWhenSkeletal;
-    public static int corpseExpiryTicks = 24000, corpseSettleTimeoutTicks = 600, corpseSkeletonTicks = 24000;
+    public static boolean corpseStoreXp = true, enableCorpseCompass = true, removeCompassWhenLooted = true,
+        ownerOnlyLooting, othersLootWhenSkeletal;
+    public static int corpseExpiryTicks = 24000, corpseSkeletonTicks = 24000;
     public static boolean disableInSingleplayer = true, blockActionsWhileKnocked = true, totemPreventsDowned = true;
     public static int downedSeconds = 60, downedInvulnerableTicks = 10, reviveSeconds = 10, reviveDecaySeconds = 30,
         secondChanceCooldownSeconds = 120;
@@ -47,16 +47,13 @@ public final class OriginalGameplay {
 
     public static void config(Configuration ignored) {
         CorpseConfig.Section pc = CorpseConfig.section("corpse.rules", "Тела игроков.");
-        enableCorpses = pc.on("enableCorpses", true, "Оставлять физическое тело с вещами после смерти.");
         corpseExpiryTicks = pc.num(
             "corpseExpiryTicks",
             24000,
             1200,
             2400000,
             "Загруженных тиков до выпадения вещей и исчезновения тела. 24000 — игровой день.");
-        corpseSettleTimeoutTicks = pc
-            .num("corpseSettleTimeoutTicks", 600, 20, 6000, "Максимум тиков ожидания покоя тела после смерти.");
-        corpseStoreXp = pc.on("corpseStoreXp", true, "Сохранять выпадающий ванильный опыт в теле до обыска.");
+        corpseStoreXp = pc.on("corpseStoreXp", true, "Сохранять в теле накопленный опыт с учётом штрафа за смерть.");
         enableCorpseCompass = pc.on("enableCorpseCompass", true, "Выдавать после возрождения компас последнего тела.");
         removeCompassWhenLooted = pc.on(
             "removeCompassWhenLooted",
@@ -130,7 +127,6 @@ public final class OriginalGameplay {
         downedMarkerHeight = view.num("downedMarkerHeight", .7F, 0F, 4F, "Высота метки над физическим туловищем.");
 
         // Corpse presentation rules; the penalty section owns XP retention, item loss and durability.
-        Corpses.enabled = enableCorpses;
         Corpses.asBlock = false;
         Corpses.dropOnDespawn = true;
         Corpses.keepEmpty = true;
@@ -138,7 +134,6 @@ public final class OriginalGameplay {
         CorpseConfig.ownerLockMinutes = ownerOnlyLooting ? -1 : 0;
         CorpseConfig.searchSeconds = 0;
         CorpseConfig.restoreSlots = true;
-        CorpseConfig.tape = false;
         CorpseConfig.drag = true;
         if (!CorpseConfig.crawlDowned) {
             CorpseConfig.downed = CorpseConfig.friendRevive = true;

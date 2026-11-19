@@ -69,7 +69,6 @@ public class ContainerCorpse extends Container {
     @Override
     public void onContainerClosed(EntityPlayer p) {
         super.onContainerClosed(p);
-        if (body instanceof EntityCorpse) ((EntityCorpse) body).retrieved(p); // before closing: that may end it
         body.closeInventory();
     }
 

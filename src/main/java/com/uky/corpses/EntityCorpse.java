@@ -883,28 +883,6 @@ public class EntityCorpse extends Entity implements IInventory, IEntityAdditiona
     @Override
     public void openInventory() {}
 
-    /**
-     * The window closed on p. Its owner having taken everything back, the tape of this death (theirs, of this body:
-     * same owner, same moment) has nothing left to tell, and goes from their inventory (CorpseConfig.tapeGone).
-     */
-    void retrieved(EntityPlayer p) {
-        if (worldObj.isRemote || !CorpseConfig.tapeGone || !isOwner(p) || !empty()) return;
-        ItemStack[] inv = p.inventory.mainInventory;
-        boolean gone = false;
-        for (int i = 0; i < inv.length; i++) {
-            ItemStack s = inv[i];
-            if (s == null || s.getItem() != UkyCorpses.tape || !s.hasTagCompound()) continue;
-            NBTTagCompound t = s.getTagCompound();
-            if (owner().equals(t.getString("owner")) && t.getLong("created") == created) {
-                inv[i] = null;
-                gone = true;
-            }
-        }
-        if (!gone) return;
-        p.inventory.markDirty();
-        p.addChatMessage(new ChatComponentTranslation("ukycorpses.msg.tapeGone"));
-    }
-
     @Override
     public void closeInventory() {}
 

@@ -62,8 +62,17 @@ public final class LegacyConfig {
     }
 
     public static void discardUnused(Configuration config) {
-        for (String name : new String[] { "leaning", "leaningornot" })
+        for (String name : new String[] { "leaning", "leaningornot", "corpse.tape", "corpse.access", "deathcam" })
             if (config.hasCategory(name)) config.removeCategory(config.getCategory(name));
+        discard(config, "corpse", "enabled", "asBlock", "despawnSeconds", "dropItemsOnDespawn", "keepEmpty");
+        discard(config, "corpse.handling", "drag");
+        discard(config, "corpse.rules", "corpseSettleTimeoutTicks");
+    }
+
+    private static void discard(Configuration config, String category, String... keys) {
+        if (!config.hasCategory(category)) return;
+        for (String key : keys) if (config.hasKey(category, key)) config.getCategory(category)
+            .remove(key);
     }
 
     public static void gameplayDefaults(Configuration config) {
