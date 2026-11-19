@@ -97,6 +97,10 @@ public final class Hooks {
                 healthLoss);
     }
 
+    public static boolean playerRenderPre(Object bus, Object event) {
+        return ClientHooks.playerRenderPre(bus, event);
+    }
+
     public static boolean dragHands(float partial) {
         return FMLCommonHandler.instance()
             .getSide()

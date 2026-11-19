@@ -288,7 +288,7 @@ public final class SkinBlood {
                         : SurfaceBloodClientConfig.WOUNDS.get()))
                     continue;
                 float[] uv = uv(wound.part, wound.face, wound.local);
-                float sx = width / 64F, sy = height / 32F;
+                float sx = width / 64F, sy = !armor && width == height ? sx : height / 32F;
                 float fade = 1 - wound.wash;
                 if (body.healed >= 0) {
                     long lasts = wound.spatter ? SurfaceBloodClientConfig.SPATTER_LASTS.get() * 20L : 300;

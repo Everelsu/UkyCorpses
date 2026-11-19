@@ -52,6 +52,19 @@ public final class CoreTransformer implements IClassTransformer {
         new ClassReader(bytes).accept(type, ClassReader.EXPAND_FRAMES);
         boolean changed = false;
         for (MethodNode method : type.methods) {
+            if (player && named(method, "doRender", "func_76986_a")
+                && method.desc.startsWith("(Lnet/minecraft/client/entity/AbstractClientPlayer;")
+                && !contains(method, "playerRenderPre")) {
+                for (AbstractInsnNode at = method.instructions.getFirst(); at != null; at = at.getNext())
+                    if (at instanceof MethodInsnNode
+                        && ((MethodInsnNode) at).owner.equals("cpw/mods/fml/common/eventhandler/EventBus")
+                        && ((MethodInsnNode) at).name.equals("post")) {
+                            method.instructions
+                                .set(at, call("playerRenderPre", "(Ljava/lang/Object;Ljava/lang/Object;)Z"));
+                            changed = true;
+                            break;
+                        }
+            }
             if (serverPlayer && named(method, "setPositionAndUpdate", "func_70634_a")
                 && method.desc.equals("(DDD)V")
                 && !contains(method, "teleported")) {

@@ -4,12 +4,15 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.ModelBiped;
+import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import org.lwjgl.opengl.GL11;
@@ -18,6 +21,8 @@ import com.uky.corpses.stains.client.GearBlood;
 import com.uky.corpses.stains.client.SkinBlood;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.Event;
+import cpw.mods.fml.common.eventhandler.EventBus;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -69,6 +74,23 @@ final class ClientHooks {
     static void copied(Object original, Object copy) {
         if (original instanceof ItemStack && copy instanceof ItemStack)
             GearBlood.copied((ItemStack) original, (ItemStack) copy);
+    }
+
+    static boolean playerRenderPre(Object bus, Object event) {
+        ModelBiped model = ((RenderPlayerEvent.Pre) event).renderer.modelBipedMain;
+        ModelRenderer[] parts = { model.bipedHead, model.bipedHeadwear, model.bipedBody, model.bipedRightArm,
+            model.bipedLeftArm, model.bipedRightLeg, model.bipedLeftLeg };
+        int hidden = 0;
+        for (int index = 0; index < parts.length; index++)
+            if (parts[index] != null && parts[index].isHidden) hidden |= 1 << index;
+        boolean canceled = true;
+        try {
+            canceled = ((EventBus) bus).post((Event) event);
+            return canceled;
+        } finally {
+            if (canceled) for (int index = 0; index < parts.length; index++)
+                if (parts[index] != null) parts[index].isHidden = (hidden & 1 << index) != 0;
+        }
     }
 
     static boolean dragHands(float partial) {

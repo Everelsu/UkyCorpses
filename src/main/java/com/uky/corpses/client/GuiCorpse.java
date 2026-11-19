@@ -253,9 +253,10 @@ public class GuiCorpse extends GuiContainer {
         mc.getTextureManager()
             .bindTexture(RenderCorpse.skin(body.owner()));
         GL11.glColor4f(0.85F, 0.84F, 0.82F, 1);
-        func_152125_a(x, y, 8, 8, 8, 8, 16, 16, 64, 32);
+        int height = (int) (32 / RenderCorpse.boundSkinV());
+        func_152125_a(x, y, 8, 8, 8, 8, 16, 16, 64, height);
         GL11.glEnable(GL11.GL_BLEND);
-        func_152125_a(x, y, 40, 8, 8, 8, 16, 16, 64, 32);
+        func_152125_a(x, y, 40, 8, 8, 8, 16, 16, 64, height);
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glColor4f(1, 1, 1, 1);
     }

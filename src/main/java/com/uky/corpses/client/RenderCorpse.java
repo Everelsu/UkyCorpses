@@ -140,7 +140,10 @@ public class RenderCorpse extends Render {
         multiply(frame);
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 
-        layers(e, skin, armor, tint, ~hidden & ~faded, 1, swing, swingAmount);
+        ResourceLocation paintedSkin = com.uky.corpses.stains.client.SkinBlood.texture(e, 63, skin, false);
+        bindTexture(paintedSkin);
+        float skinV = boundSkinV();
+        layers(e, paintedSkin, armor, tint, ~hidden & ~faded, 1, swing, swingAmount, skinV);
         if (held != null && (!own || fade[0] > 0.99F)) hold(e, held); // a see-through hand holds nothing solid
         // an arm close to the eye (a hand thrown over the face): see-through, never just gone
         for (int arm = 0; arm < 2; arm++) {
@@ -150,7 +153,7 @@ public class RenderCorpse extends Render {
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             GL11.glAlphaFunc(GL11.GL_GREATER, 0.003921569F);
             GL11.glDepthMask(false);
-            layers(e, skin, armor, tint, bit, fade[arm], swing, swingAmount);
+            layers(e, paintedSkin, armor, tint, bit, fade[arm], swing, swingAmount, skinV);
             GL11.glDepthMask(true);
             GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
             GL11.glDisable(GL11.GL_BLEND);
@@ -174,6 +177,9 @@ public class RenderCorpse extends Render {
         GL11.glPushMatrix();
         GL11.glTranslated(x, y, z);
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        ResourceLocation paintedSkin = com.uky.corpses.stains.client.SkinBlood.texture(c, 63, skin, false);
+        bindTexture(paintedSkin);
+        float skinV = boundSkinV();
         Mat4 model = new Mat4(), inverse = new Mat4();
         for (int i = 0; i < Skeleton.PARTS; i++) {
             if (own && i == Skeleton.HEAD
@@ -191,7 +197,7 @@ public class RenderCorpse extends Render {
                 GL11.glAlphaFunc(GL11.GL_GREATER, .003921569F);
                 GL11.glDepthMask(false);
             }
-            layers(c, skin, armor, tint, 1 << i, alpha, 0, 0);
+            layers(c, paintedSkin, armor, tint, 1 << i, alpha, 0, 0, skinV);
             if (i == Skeleton.RARM && held != null && alpha >= .99F) hold(c, held);
             if (alpha < .99F) {
                 GL11.glDepthMask(true);
@@ -215,15 +221,34 @@ public class RenderCorpse extends Render {
 
     /** The skin and the armor over it, of the parts in mask (a bit per Skeleton part), at alpha. */
     private void layers(Entity e, ResourceLocation skin, ItemStack[] armor, float[] tint, int mask, float alpha,
-        float swing, float swingAmount) {
+        float swing, float swingAmount, float skinV) {
         if (e instanceof EntityCorpse) mask &= ~((EntityCorpse) e).ampHiddenMask();
         boolean skeletal = e instanceof EntityCorpse && ((EntityCorpse) e).isSkeletal();
         ModelCorpse surface = skeletal ? bones : body;
         bones.ang = body.ang;
-        bindTexture(skeletal ? BONE_SKIN : com.uky.corpses.stains.client.SkinBlood.texture(e, 63, skin, false));
+        bindTexture(skeletal ? BONE_SKIN : skin);
         GL11.glColor4f(tint[0], tint[1], tint[2], alpha);
         show(surface, mask);
-        render(surface, e, swing, swingAmount);
+        if (skeletal) skinV = 1;
+        GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT);
+        if (skinV != 1) {
+            GL11.glMatrixMode(GL11.GL_TEXTURE);
+            GL11.glPushMatrix();
+            GL11.glScalef(1, skinV, 1);
+            GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        }
+        try {
+            GL11.glEnable(GL11.GL_ALPHA_TEST);
+            GL11.glAlphaFunc(GL11.GL_GREATER, alpha < .99F ? .003921569F : .1F);
+            render(surface, e, swing, swingAmount);
+        } finally {
+            if (skinV != 1) {
+                GL11.glMatrixMode(GL11.GL_TEXTURE);
+                GL11.glPopMatrix();
+                GL11.glMatrixMode(GL11.GL_MODELVIEW);
+            }
+            GL11.glPopAttrib();
+        }
         show(surface, -1);
         for (int pass = 0; pass < 4; pass++) { // as RenderPlayer.shouldRenderPass: 0 helmet .. 3 boots
             ItemStack s = armor[3 - pass];
@@ -402,6 +427,12 @@ public class RenderCorpse extends Render {
 
     private static void render(ModelCorpse m, Entity e, float swing, float amount) {
         m.render(e, swing, amount, 0, 0, 0, 0.0625F);
+    }
+
+    static float boundSkinV() {
+        int width = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
+        int height = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
+        return width > 0 && height == width ? .5F : 1F;
     }
 
     @Override

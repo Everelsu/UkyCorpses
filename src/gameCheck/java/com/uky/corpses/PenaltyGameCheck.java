@@ -36,6 +36,8 @@ public final class PenaltyGameCheck {
         Minecraft mc = Minecraft.getMinecraft();
         if (phase >= 2 && !checkedTabs) {
             checkedTabs = true;
+            com.uky.corpses.client.CorpseSkinGameCheck.run();
+            UkyCorpses.LOG.info("SKINQA Armor, headwear and transparent pixels render on 64x32 and 64x64 skins");
             List<ItemStack> items = new ArrayList<>();
             Medicine.tab.displayAllReleventItems(items);
             check(items.size() == 17, "Creative tab has all 17 medicine items");
