@@ -64,6 +64,11 @@ public final class Medicine {
     public static Potion BLEEDING, SHOCK, STUN, EUPHORIA, INVERSION, ADRENALINE;
     public static Item RAG, BANDAGE, MEDKIT, SCANNER, SYRINGE, INJECTOR, DEFIB, CLUB, TOXILIN, ICON;
     public static CreativeTabs tab;
+    private static final List<Item> creativeItems = new ArrayList<>();
+
+    public static int creativeOrder(Item item) {
+        return creativeItems.indexOf(item);
+    }
 
     // config
     public static boolean shockAfterRevive, selfAdrenaline;
@@ -230,6 +235,13 @@ public final class Medicine {
             public Item getTabIconItem() {
                 return ICON;
             }
+
+            @Override
+            @SideOnly(Side.CLIENT)
+            @SuppressWarnings({ "rawtypes", "unchecked" })
+            public void displayAllReleventItems(List items) {
+                for (Item item : creativeItems) item.getSubItems(item, this, items);
+            }
         };
         // stacks: cheap and small things stack high, what saves a life stays scarce
         BANDAGE = reg("bandage", MedItem.Kind.HEAL, 8, 40, 3);
@@ -244,6 +256,7 @@ public final class Medicine {
         for (String n : new String[] { "morphinol", "flyuk", "nalgezin", "stimulin", "paracetol", "kserin", "placebo",
             "antidepressant" }) pill(n);
         ICON = reg("pills_icon", MedItem.Kind.PLAIN, 1, 0, 0);
+        creativeItems.addAll(0, Arrays.asList(BANDAGE, MEDKIT, RAG, SYRINGE, INJECTOR, DEFIB, SCANNER, CLUB));
 
         EntityRegistry.registerModEntity(EntitySeat.class, "seat", 10, UkyCorpses.instance, 64, 20, false);
     }
@@ -265,6 +278,7 @@ public final class Medicine {
     private static Item reg(String name, MedItem.Kind kind, int stack, int use, float heal) {
         MedItem i = new MedItem(name, kind, stack, use, heal);
         GameRegistry.registerItem(i, name);
+        if (kind == MedItem.Kind.PILL) creativeItems.add(i);
         return i;
     }
 

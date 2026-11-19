@@ -254,7 +254,7 @@ public class UkyCorpses {
                 lost.add(s);
                 continue;
             }
-            wear(s);
+            s = com.uky.corpses.compat.EquipmentPenalty.apply(s, CorpseConfig.durabilityLossPercent);
             entries.add(new EntityCorpse.Entry(CorpseConfig.restoreSlots && slot != null ? slot : -1, s));
         }
         if (!Ragdoll.enabled && entries.isEmpty() && xp == 0 && lost.isEmpty()) return;
@@ -499,13 +499,6 @@ public class UkyCorpses {
             }
         }
         return null;
-    }
-
-    private static void wear(ItemStack s) {
-        if (CorpseConfig.durabilityLossPercent <= 0 || !s.isItemStackDamageable()) return;
-        int max = s.getMaxDamage();
-        int worn = Math.min(max - 1, s.getItemDamage() + max * CorpseConfig.durabilityLossPercent / 100);
-        s.setItemDamage(Math.max(s.getItemDamage(), worn)); // never breaks it, never repairs it
     }
 
     /** What level + bar are worth in points. experienceTotal can't be trusted: /xp and enchanting skew it. */

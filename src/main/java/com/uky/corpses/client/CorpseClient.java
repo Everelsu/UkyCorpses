@@ -1,9 +1,11 @@
 package com.uky.corpses.client;
 
+import java.util.Comparator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
@@ -12,6 +14,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import com.uky.corpses.EntityCorpse;
 import com.uky.corpses.TileCorpse;
 import com.uky.corpses.UkyCorpses;
+import com.uky.corpses.medicine.Medicine;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
@@ -74,7 +77,23 @@ public final class CorpseClient {
     /** The one body renderer: the corpse window draws its figure with it. */
     public static RenderCorpse renderer;
 
+    private static void registerNeiOrder() {
+        if (!cpw.mods.fml.common.Loader.isModLoaded("NotEnoughItems")) return;
+        Comparator<ItemStack> order = Comparator.comparingInt(stack -> {
+            int index = Medicine.creativeOrder(stack.getItem());
+            return index < 0 ? Integer.MAX_VALUE : index;
+        });
+        try {
+            Class.forName("codechicken.nei.api.API")
+                .getMethod("addSortOption", String.class, Comparator.class)
+                .invoke(null, "ukycorpses.nei.itemsort.creative", order);
+        } catch (ReflectiveOperationException | LinkageError failure) {
+            UkyCorpses.LOG.warn("Could not register the creative order in NEI", failure);
+        }
+    }
+
     public static void init() {
+        registerNeiOrder();
         RenderCorpse body = renderer = new RenderCorpse();
         RenderingRegistry.registerEntityRenderingHandler(EntityCorpse.class, body);
         ClientRegistry.bindTileEntitySpecialRenderer(TileCorpse.class, new RenderCorpseTile(body));

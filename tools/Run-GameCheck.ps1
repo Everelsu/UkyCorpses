@@ -1,4 +1,4 @@
-param([switch]$Offline, [ValidateSet(8,17)][int]$JavaVersion = 8, [Alias('HbmJar')][string]$HbmDevJar)
+param([switch]$Offline, [ValidateSet(8,17)][int]$JavaVersion = 8, [Alias('HbmJar')][string]$HbmDevJar, [switch]$PenaltyOnly)
 $ErrorActionPreference = 'Stop'
 $workspace = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $initPath = Join-Path $workspace 'build/portqa.init.gradle'
@@ -21,6 +21,7 @@ gradle.projectsEvaluated {
     root.tasks.named("__QA_TASK__").configure {
         dependsOn(root.tasks.named("gameCheckJar"))
         jvmArgs("-Duky.portqa=true")
+        if (System.getProperty("uky.portqa.penaltyOnly") == "true") jvmArgs("-Duky.portqa.penaltyOnly=true")
         doFirst {
             root.copy {
                 from(root.layout.buildDirectory.file("gamecheck/uky-port-gamecheck.jar"))
@@ -34,6 +35,7 @@ $env:HOTSWAP = 'false'
 $qaArgs = @($qaTask, '--no-configuration-cache', "-PrunClientWorkingDirectory=$qaDirectory", '--username=PortQA', '-I', $initPath, '--console=plain')
 if ($JavaVersion -eq 17) { $qaArgs += @('-x', 'setupHotswapAgent17') }
 if ($Offline) { $qaArgs += '--offline' }
+if ($PenaltyOnly) { $qaArgs += '-Duky.portqa.penaltyOnly=true' }
 Push-Location $workspace
 try {
     $started = [DateTime]::UtcNow

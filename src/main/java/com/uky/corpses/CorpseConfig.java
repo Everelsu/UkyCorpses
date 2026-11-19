@@ -122,7 +122,7 @@ public final class CorpseConfig {
                 DEFAULTS[i][1],
                 0,
                 100,
-                "Сколько % прочности теряют инструменты и броня.");
+                "Процент от максимальной прочности, ёмкости батареи или магазина, который теряет предмет.");
             int loss = m.num("itemLossPercent", DEFAULTS[i][2], 0, 100, "Шанс каждого стака сгореть при смерти, %.");
             if (MODES[i].equals(mode)) {
                 keepXpPercent = xp;

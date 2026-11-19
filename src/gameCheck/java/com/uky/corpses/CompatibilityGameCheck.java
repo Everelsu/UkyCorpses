@@ -5,6 +5,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
+import com.uky.corpses.compat.EquipmentPenalty;
 import com.uky.corpses.stains.client.GearBlood;
 
 import cpw.mods.fml.common.Loader;
@@ -30,17 +31,15 @@ public final class CompatibilityGameCheck {
                 "Unified retrieve subcommand reaches the existing recovery handler");
         }
 
-        java.lang.reflect.Method wear = UkyCorpses.class.getDeclaredMethod("wear", ItemStack.class);
-        wear.setAccessible(true);
         int saved = CorpseConfig.durabilityLossPercent;
         ItemStack tool = new ItemStack(net.minecraft.init.Items.diamond_pickaxe);
         try {
             CorpseConfig.durabilityLossPercent = 10;
-            wear.invoke(null, tool);
+            EquipmentPenalty.apply(tool, CorpseConfig.durabilityLossPercent);
             check(tool.getItemDamage() == tool.getMaxDamage() / 10, "Death penalty applies configured tool wear");
             CorpseConfig.durabilityLossPercent = 0;
             int before = tool.getItemDamage();
-            wear.invoke(null, tool);
+            EquipmentPenalty.apply(tool, CorpseConfig.durabilityLossPercent);
             check(tool.getItemDamage() == before, "Disabled durability penalty preserves the item");
             float bar = player.experience;
             int level = player.experienceLevel;
