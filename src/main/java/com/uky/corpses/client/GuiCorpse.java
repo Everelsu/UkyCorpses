@@ -262,9 +262,9 @@ public class GuiCorpse extends GuiContainer {
     }
 
     /** UkyUI's flat button: dark, a hairline that turns gold under the mouse with a wash of gold behind the label. */
-    private static final class Flat extends GuiButton {
+    public static final class Flat extends GuiButton {
 
-        Flat(int id, int x, int y, int w, int h, String label) {
+        public Flat(int id, int x, int y, int w, int h, String label) {
             super(id, x, y, w, h, label);
         }
 

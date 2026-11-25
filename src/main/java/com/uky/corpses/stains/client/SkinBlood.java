@@ -68,7 +68,8 @@ public final class SkinBlood {
         DynamicTexture texture;
         ResourceLocation id;
         int revision, width, height;
-        long phase;
+        long phase, settledAt, healed, dryTicks;
+        int options;
         BufferedImage source;
     }
 
@@ -266,13 +267,28 @@ public final class SkinBlood {
         if (body == null || body.wounds.isEmpty() || armor && !SurfaceBloodClientConfig.ARMOUR_WOUNDS.get())
             return base;
         long now = e.worldObj.getTotalWorldTime(), phase = now / 20;
+        long dryTicks = Math.max(1, SurfaceBloodClientConfig.DRY_TIME.get() * 20L);
+        boolean spatter = SurfaceBloodClientConfig.SPATTER.get(), wounds = SurfaceBloodClientConfig.WOUNDS.get();
+        int options = (spatter ? 1 : 0) | (wounds ? 2 : 0) | SurfaceBloodClientConfig.SPATTER_LASTS.get() << 2;
+        boolean applicable = false;
+        for (Wound wound : body.wounds)
+            if (wound.armor == armor && (mask & 1 << wound.part) != 0 && (wound.spatter ? spatter : wounds)) {
+                applicable = true;
+                break;
+            }
+        if (!applicable) return base;
         String cache = key(e) + "|" + base + "|" + mask + "|" + armor;
         Baked b = textures.get(cache);
         ensureReloadListener();
         try {
             BufferedImage original = source(base);
             if (original == null) return base;
-            if (b != null && b.revision == body.revision && b.phase == phase && b.source == original) return b.id;
+            if (b != null && b.revision == body.revision
+                && b.source == original
+                && b.healed == body.healed
+                && b.dryTicks == dryTicks
+                && b.options == options
+                && (b.phase == phase || b.settledAt != Long.MAX_VALUE && b.phase * 20 >= b.settledAt)) return b.id;
             BufferedImage image = copyImage(original);
             int width = image.getWidth(), height = image.getHeight();
             if (b != null && (b.width != width || b.height != height)) {
@@ -282,10 +298,10 @@ public final class SkinBlood {
                 textures.remove(cache);
                 b = null;
             }
+            WoundMask solid = new WoundMask(original);
+            long settledAt = body.healed < 0 ? 0 : Long.MAX_VALUE;
             for (Wound wound : body.wounds) {
-                if (wound.armor != armor || (mask & 1 << wound.part) == 0
-                    || !(wound.spatter ? SurfaceBloodClientConfig.SPATTER.get()
-                        : SurfaceBloodClientConfig.WOUNDS.get()))
+                if (wound.armor != armor || (mask & 1 << wound.part) == 0 || !(wound.spatter ? spatter : wounds))
                     continue;
                 float[] uv = uv(wound.part, wound.face, wound.local);
                 float sx = width / 64F, sy = !armor && width == height ? sx : height / 32F;
@@ -294,7 +310,7 @@ public final class SkinBlood {
                     long lasts = wound.spatter ? SurfaceBloodClientConfig.SPATTER_LASTS.get() * 20L : 300;
                     fade *= Math.max(0, Math.min(1, (lasts - (now - body.healed)) / (float) Math.min(100, lasts)));
                 }
-                paintOriginal(image, wound, uv, sx, sy, now, fade);
+                settledAt = Math.max(settledAt, paintOriginal(image, solid, wound, uv, sx, sy, now, dryTicks, fade));
 
             }
             if (b == null) {
@@ -311,6 +327,10 @@ public final class SkinBlood {
             b.texture.updateDynamicTexture();
             b.revision = body.revision;
             b.phase = phase;
+            b.settledAt = settledAt;
+            b.healed = body.healed;
+            b.dryTicks = dryTicks;
+            b.options = options;
             b.source = original;
             while (textures.size() > 160) {
                 String first = textures.keySet()
@@ -327,10 +347,10 @@ public final class SkinBlood {
         }
     }
 
-    private static void paintOriginal(BufferedImage image, Wound wound, float[] uv, float sx, float sy, long now,
-        float fade) {
-        WoundCanvas canvas = new WoundCanvas(image.getWidth(), image.getHeight());
-        WoundMask mask = new WoundMask(image);
+    private static long paintOriginal(BufferedImage image, WoundMask mask, Wound wound, float[] uv, float sx, float sy,
+        long now, long dryTicks, float fade) {
+        int width = image.getWidth();
+        WoundCanvas canvas = new WoundCanvas(width, image.getHeight());
         int x0 = (int) Math.floor(uv[2] * sx), y0 = (int) Math.floor(uv[3] * sy), x1 = (int) Math.ceil(uv[4] * sx),
             y1 = (int) Math.ceil(uv[5] * sy);
         WoundCanvas.Locator locator = (x, y,
@@ -364,12 +384,12 @@ public final class SkinBlood {
             new WoundCanvas.Pigment(wound.color, wound.dried, true),
             wound.born,
             new Random(wound.born * 31 + wound.part * 7 + wound.face));
-        int[] pixels = canvas.pixels(now, Math.max(1, SurfaceBloodClientConfig.DRY_TIME.get() * 20L), 1 - fade);
-        for (int y = Math.max(0, y0); y < Math.min(image.getHeight(), y1); y++)
-            for (int x = Math.max(0, x0); x < Math.min(image.getWidth(), x1); x++) {
-                int pixel = pixels[y * image.getWidth() + x];
-                if ((pixel >>> 24) != 0) image.setRGB(x, y, (image.getRGB(x, y) & 0xff000000) | (pixel & 0xffffff));
-            }
+        canvas.forEachPixel(now, dryTicks, 1 - fade, (index, pixel) -> {
+            int x = index % width, y = index / width;
+            if (x >= x0 && x < x1 && y >= y0 && y < y1)
+                image.setRGB(x, y, (image.getRGB(x, y) & 0xff000000) | (pixel & 0xffffff));
+        });
+        return canvas.settledAt(dryTicks);
     }
 
     public static void tick(EntityLivingBase e) {
@@ -385,9 +405,10 @@ public final class SkinBlood {
             w.wash = Math.min(1, w.wash + (wet ? 1 / 80F : 1 / 500F));
             body.revision++;
         }
-        body.wounds.removeIf(
+        if (body.wounds.removeIf(
             w -> w.wash >= 1 || body.healed >= 0 && e.worldObj.getTotalWorldTime() - body.healed
-                > (w.spatter ? SurfaceBloodClientConfig.SPATTER_LASTS.get() * 20L : 300));
+                > (w.spatter ? SurfaceBloodClientConfig.SPATTER_LASTS.get() * 20L : 300)))
+            body.revision++;
     }
 
     public static void clear() {

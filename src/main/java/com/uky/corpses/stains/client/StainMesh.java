@@ -105,7 +105,8 @@ public final class StainMesh {
     private static void drawMesh(World level, Stain stain, Mesh mesh, Tessellator out, double cameraX, double cameraY,
         double cameraZ, float partial) {
         long now = level.getTotalWorldTime();
-        int color = Stain.blend(stain.color, stain.dried, stain.dry(now));
+        float dry = stain.dry(now), surfaceLevel = stain.level(now + partial);
+        int color = Stain.blend(stain.color, stain.dried, dry);
         float shade = stain.face.offsetY > 0 ? 1 : stain.face.offsetY < 0 ? .5F : stain.face.offsetX != 0 ? .6F : .8F;
         out.setColorRGBA_F(
             (color >> 16 & 255) / 255F * shade,
@@ -114,7 +115,7 @@ public final class StainMesh {
             stain.alpha(now));
         double[] origin = mesh.origin;
         for (Face face : mesh.faces) {
-            StainShader.surface(out, stain.level(now + partial), 1 - stain.dry(now), face.light);
+            StainShader.surface(out, surfaceLevel, 1 - dry, face.light);
             int count = face.polygon.length / 4;
             // Same quad fan as the original mesher, including a degenerate last triangle for odd polygons.
             for (int i = 1; i + 1 < count; i += 2) {
@@ -162,6 +163,7 @@ public final class StainMesh {
                     z = stain.face.offsetX != 0 ? bs : stain.face.offsetY != 0 ? bt : bn;
                 if (!level.blockExists(x, y, z)) continue;
                 Block block = level.getBlock(x, y, z);
+                if (block.isLeaves(level, x, y, z)) continue;
                 boxes.clear();
                 block.addCollisionBoxesToList(
                     level,

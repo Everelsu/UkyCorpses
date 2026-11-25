@@ -385,9 +385,13 @@ public final class Ragdoll {
     }
 
     public void applyState(float[] state, int mask) {
+        applyState(state, mask, 1);
+    }
+
+    public void applyState(float[] state, int mask, float previousFraction) {
         if (!validState(state)) throw new IllegalArgumentException("Invalid ragdoll snapshot");
         for (int i = 0; i < bodies.length; i++) {
-            before[i].set(after[i]);
+            before[i].set(previousFraction >= 1 ? after[i] : sample(i, previousFraction));
             after[i].set(decode(state, i));
             bodies[i].setWorldTransform(after[i]);
             int j = i * STRIDE;
@@ -402,12 +406,14 @@ public final class Ragdoll {
 
     public Skeleton.Shape shape(float partial, double dx, double dy, double dz) {
         partial = Math.max(0, Math.min(1, partial));
-        Transform torso = sample(Skeleton.BODY, partial), inverse = new Transform(torso);
+        Transform[] samples = new Transform[bodies.length];
+        for (int i = 0; i < samples.length; i++) samples[i] = sample(i, partial);
+        Transform torso = new Transform(samples[Skeleton.BODY]), inverse = new Transform(torso);
         inverse.inverse();
         float[] angles = new float[15];
+        Transform relative = new Transform();
         for (int i = 0; i < bodies.length; i++) if (ANGLE[i] >= 0) {
-            Transform relative = sample(i, partial);
-            relative.mul(inverse, relative);
+            relative.mul(inverse, samples[i]);
             Matrix3f m = relative.basis;
             int a = ANGLE[i];
             angles[a + 1] = (float) Math.asin(Math.max(-1, Math.min(1, -m.m20)));
@@ -426,12 +432,18 @@ public final class Ragdoll {
         Skeleton.Shape shape = Skeleton.snapshot(frame, angles);
         shape.physical = true;
         for (int i = 0; i < bodies.length; i++) {
-            Transform at = sample(i, partial);
+            Transform at = samples[i];
             uncenter(at, i);
             write(at, shape.parts[i], PIXEL);
             shape.parts[i].moved(dx, dy, dz);
         }
         return shape;
+    }
+
+    public void torsoPosition(double[] out) {
+        out[0] = after[Skeleton.BODY].origin.x;
+        out[1] = after[Skeleton.BODY].origin.y;
+        out[2] = after[Skeleton.BODY].origin.z;
     }
 
     public void pose(float partial, Mat4 frame, float[] angles, double dx, double dy, double dz) {
@@ -452,6 +464,8 @@ public final class Ragdoll {
     }
 
     private Transform sample(int i, float partial) {
+        if (partial <= 0) return new Transform(before[i]);
+        if (partial >= 1) return new Transform(after[i]);
         Transform out = new Transform();
         Quat4f a = new Quat4f(), b = new Quat4f();
         before[i].getRotation(a);

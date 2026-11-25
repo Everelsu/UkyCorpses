@@ -186,10 +186,14 @@ class SourceVoxelCollider {
             .getMaterial() == Material.air) return MISS;
         shapes.clear();
         AxisAlignedBB cell = AxisAlignedBB.getBoundingBox(ix, iy, iz, ix + 1, iy + 1, iz + 1);
-        block.addCollisionBoxesToList(world, ix, iy, iz, cell, shapes, null);
+        // A leaf block's collision cube includes transparent gaps.
+        if (!block.isLeaves(world, ix, iy, iz)) block.addCollisionBoxesToList(world, ix, iy, iz, cell, shapes, null);
         // Legacy fence/wall shapes can extend above their owning block without a separate block state.
-        if (iy > 0) world.getBlock(ix, iy - 1, iz)
-            .addCollisionBoxesToList(world, ix, iy - 1, iz, cell, shapes, null);
+        if (iy > 0) {
+            Block below = world.getBlock(ix, iy - 1, iz);
+            if (!below.isLeaves(world, ix, iy - 1, iz))
+                below.addCollisionBoxesToList(world, ix, iy - 1, iz, cell, shapes, null);
+        }
         double best = 2;
         int axis = -1;
         for (AxisAlignedBB box : shapes) {

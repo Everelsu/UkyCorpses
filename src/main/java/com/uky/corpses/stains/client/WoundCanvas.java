@@ -488,6 +488,17 @@ final class WoundCanvas {
 
     int[] pixels(long now, long dryTicks, float fade) {
         int[] image = new int[width * height * copies];
+        forEachPixel(now, dryTicks, fade, (index, color) -> image[index] = color);
+        return image;
+    }
+
+    long settledAt(long dryTicks) {
+        long settled = 0;
+        for (int i = 0; i < count; i++) settled = Math.max(settled, Math.max(appear[i], born[i] + dryTicks));
+        return settled;
+    }
+
+    void forEachPixel(long now, long dryTicks, float fade, PixelWriter write) {
         int shown = (int) (count * (1 - WoundMath.clamp(fade, 0, 1)));
         for (int i = 0; i < shown; i++) if (appear[i] <= now) {
             float dry = (float) Math.pow(WoundMath.clamp((float) (now - born[i]) / Math.max(1, dryTicks), 0, 1), .6);
@@ -496,9 +507,13 @@ final class WoundCanvas {
             float tone = shade[i] > 1 ? WoundMath.lerp(dry, shade[i], 1) : shade[i];
             int r = Math.min(255, (int) ((rgb >> 16 & 255) * tone)), g = Math.min(255, (int) ((rgb >> 8 & 255) * tone)),
                 b = Math.min(255, (int) ((rgb & 255) * tone));
-            image[index[i]] = 0xff000000 | r << 16 | g << 8 | b;
+            write.accept(index[i], 0xff000000 | r << 16 | g << 8 | b);
         }
-        return image;
+    }
+
+    interface PixelWriter {
+
+        void accept(int index, int color);
     }
 
     private static int lerp(int from, int to, float t) {

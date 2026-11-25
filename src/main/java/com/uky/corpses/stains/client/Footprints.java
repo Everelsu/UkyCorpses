@@ -114,7 +114,9 @@ final class Footprints {
             Vec3.createVectorHelper(x, living.boundingBox.minY + .25, z),
             Vec3.createVectorHelper(x, living.boundingBox.minY - .4, z),
             false);
-        if (hit != null && hit.sideHit == 1) {
+        if (hit != null && hit.sideHit == 1
+            && !world.getBlock(hit.blockX, hit.blockY, hit.blockZ)
+                .isLeaves(world, hit.blockX, hit.blockY, hit.blockZ)) {
             float angle = (float) Math.atan2(-Math.sin(yaw), -Math.cos(yaw));
             if (SurfaceBloodClientConfig.STYLE.get() == StainSprites.Style.PIXEL)
                 angle = Math.round(angle / ((float) Math.PI / 2)) * ((float) Math.PI / 2);

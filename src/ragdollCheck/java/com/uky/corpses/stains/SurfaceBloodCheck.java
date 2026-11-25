@@ -1,5 +1,6 @@
 package com.uky.corpses.stains;
 
+import com.uky.corpses.stains.client.BloodTypes;
 import com.uky.corpses.stains.client.Stain;
 
 import io.netty.buffer.ByteBuf;
@@ -16,10 +17,23 @@ public final class SurfaceBloodCheck {
         assert Math.abs(point.zCoord + .32) < .00001 && point.yCoord == 1 : "source hit resolved onto the exit face";
         assert DamageCategory.of(net.minecraft.util.DamageSource.magic) == DamageCategory.NONE;
         assert DamageCategory.of(net.minecraft.util.DamageSource.fall) == DamageCategory.FALL;
-        assert !com.uky.corpses.stains.client.BloodTypes.named("Skeleton").bleeds;
-        assert com.uky.corpses.stains.client.BloodTypes.named("PigZombie").name.equals("rotten");
-        assert com.uky.corpses.stains.client.BloodTypes.named("Spider").name.equals("ichor");
-        assert com.uky.corpses.stains.client.BloodTypes.named("Cow").color == 0x8E1111;
+        assert !BloodTypes.named("Skeleton").bleeds;
+        assert BloodTypes.named("PigZombie").name.equals("rotten");
+        assert BloodTypes.named("Spider").name.equals("ichor");
+        assert BloodTypes.named("Cow").color == 0x8E1111;
+        assert BloodTypes.named("hbm.glyphidBehemoth").color == 0x558D32;
+        assert BloodTypes.named("hbm:glyphid_nuclear").dried == 0x293D1D;
+        assert !BloodTypes.named("Blaze").bleeds;
+        assert !BloodTypes.named("Ghast").bleeds;
+        assert !BloodTypes.named("SpecialMobs.WildfireBlaze").bleeds;
+        assert !BloodTypes.named("SpecialMobs.LavaMonster").bleeds;
+        assert !BloodTypes.named("SpecialMobs.NinjaSkeleton").bleeds;
+        assert !BloodTypes.named("SpecialMobs.GhostSpider").bleeds;
+        assert BloodTypes.named("SpecialMobs.PlaguePigZombie").name.equals("rotten");
+        assert BloodTypes.named("SpecialMobs.ToughCaveSpider").name.equals("ichor");
+        assert BloodTypes.named("SpecialMobs.FireCreeper").name.equals("creeper");
+        assert BloodTypes.named("SpecialMobs.ThiefEnderman").name.equals("ender");
+        assert BloodTypes.named("SpecialMobs.BlueberrySlime").color != BloodTypes.named("SpecialMobs.GrapeSlime").color;
         assert SurfaceBloodClientConfig.MAX_DROPLETS.get() == 2048;
         assert SurfaceBloodClientConfig.MAX_STAINS.get() == 12000;
         assert SurfaceBloodClientConfig.PALETTE.get() == SurfaceBloodClientConfig.Palette.NATURAL;

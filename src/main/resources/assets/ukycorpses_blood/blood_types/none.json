@@ -4,6 +4,6 @@
   "entities": [
     "#minecraft:skeletons", "minecraft:skeleton", "minecraft:stray", "minecraft:wither_skeleton",
     "minecraft:skeleton_horse", "minecraft:wither",
-    "minecraft:blaze", "minecraft:vex", "minecraft:allay", "minecraft:shulker", "minecraft:armor_stand"
+    "minecraft:blaze", "minecraft:ghast", "minecraft:vex", "minecraft:allay", "minecraft:shulker", "minecraft:armor_stand"
   ]
 }

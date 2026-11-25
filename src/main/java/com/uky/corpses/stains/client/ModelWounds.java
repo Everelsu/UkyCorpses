@@ -68,7 +68,9 @@ public final class ModelWounds {
         BufferedImage source;
         int revision;
         boolean painted;
-        long phase;
+        long phase, settledAt, dryTicks;
+        int options;
+        double size;
     }
 
     public static void hit(Entity entity, double x, double y, double z, float damage, int color, int dried,
@@ -164,9 +166,22 @@ public final class ModelWounds {
             Map<ResourceLocation, Baked> materials = body.textures.computeIfAbsent(part, key -> new HashMap<>());
             Baked baked = materials.get(texture);
             long now = entity.worldObj.getTotalWorldTime(), phase = now / 20;
-            if (baked == null || baked.revision != body.revision || baked.phase != phase || baked.source != source) {
+            long dryTicks = Math.max(1, SurfaceBloodClientConfig.DRY_TIME.get() * 20L);
+            boolean wounds = SurfaceBloodClientConfig.WOUNDS.get(), spatter = SurfaceBloodClientConfig.SPATTER.get();
+            int options = (wounds ? 1 : 0) | (spatter ? 2 : 0);
+            double size = SurfaceBloodClientConfig.WOUND_SIZE.get() * SurfaceBloodClientConfig.preset().wound;
+            if (baked == null || baked.revision != body.revision
+                || baked.source != source
+                || baked.dryTicks != dryTicks
+                || baked.options != options
+                || baked.size != size
+                || baked.phase != phase && baked.phase * 20 < baked.settledAt) {
                 BufferedImage image = SkinBlood.copyImage(source);
-                for (Hit hit : body.wounds) if (hit.part == part && hit.uv != null) paint(image, hit, now);
+                WoundMask mask = new WoundMask(source);
+                long settledAt = 0;
+                boolean[] painted = { false };
+                for (Hit hit : body.wounds) if (hit.part == part && hit.uv != null && (hit.spatter ? spatter : wounds))
+                    settledAt = Math.max(settledAt, paint(image, mask, hit, now, dryTicks, size, painted));
                 if (baked == null || baked.source.getWidth() != source.getWidth()
                     || baked.source.getHeight() != source.getHeight()) {
                     if (baked != null) Minecraft.getMinecraft()
@@ -187,18 +202,17 @@ public final class ModelWounds {
                     baked.texture.getTextureData(),
                     0,
                     image.getWidth());
-                baked.painted = false;
-                for (int y = 0; y < image.getHeight() && !baked.painted; y++)
-                    for (int x = 0; x < image.getWidth(); x++) if (image.getRGB(x, y) != source.getRGB(x, y)) {
-                        baked.painted = true;
-                        break;
-                    }
-                baked.texture.updateDynamicTexture();
+                baked.painted = painted[0];
+                if (baked.painted) baked.texture.updateDynamicTexture();
                 baked.revision = body.revision;
                 baked.phase = phase;
                 baked.source = source;
+                baked.settledAt = settledAt;
+                baked.dryTicks = dryTicks;
+                baked.options = options;
+                baked.size = size;
             }
-            Minecraft.getMinecraft()
+            if (baked.painted) Minecraft.getMinecraft()
                 .getTextureManager()
                 .bindTexture(baked.id);
         } catch (java.io.IOException failure) {
@@ -206,19 +220,17 @@ public final class ModelWounds {
         }
     }
 
-    private static void paint(BufferedImage image, Hit hit, long now) {
+    private static long paint(BufferedImage image, WoundMask mask, Hit hit, long now, long dryTicks, double size,
+        boolean[] painted) {
         int w = image.getWidth(), h = image.getHeight();
         float[] uv = hit.uv;
         WoundCanvas canvas = new WoundCanvas(w, h);
         WoundCanvas.Locator locate = (x, y,
             upright) -> x >= uv[2] * w && x < uv[4] * w && y >= uv[3] * h && y < uv[5] * h ? WoundCanvas.spot(x, y, 0)
                 : -1;
-        float radius = (float) (Math.max(1, Math.min(3.2, .8 + Math.sqrt(hit.damage) * .5))
-            * SurfaceBloodClientConfig.WOUND_SIZE.get()
-            * SurfaceBloodClientConfig.preset().wound);
-        if (!(hit.spatter ? SurfaceBloodClientConfig.SPATTER.get() : SurfaceBloodClientConfig.WOUNDS.get())) return;
+        float radius = (float) (Math.max(1, Math.min(3.2, .8 + Math.sqrt(hit.damage) * .5)) * size);
         if (hit.spatter) canvas.spatter(
-            new WoundMask(image),
+            mask,
             locate,
             (int) (uv[0] * w),
             (int) (uv[1] * h),
@@ -231,7 +243,7 @@ public final class ModelWounds {
             hit.born,
             new Random(hit.born * 31));
         else canvas.wound(
-            new WoundMask(image),
+            mask,
             locate,
             (int) (uv[0] * w),
             (int) (uv[1] * h),
@@ -246,9 +258,16 @@ public final class ModelWounds {
             new WoundCanvas.Pigment(hit.color, hit.dried, true),
             hit.born,
             new Random(hit.born * 31));
-        int[] pixels = canvas.pixels(now, Math.max(1, SurfaceBloodClientConfig.DRY_TIME.get() * 20L), hit.wash);
-        for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) if (pixels[y * w + x] != 0)
-            image.setRGB(x, y, image.getRGB(x, y) & 0xff000000 | pixels[y * w + x] & 0xffffff);
+        canvas.forEachPixel(now, dryTicks, hit.wash, (index, pixel) -> {
+            int x = index % w, y = index / w;
+            int previous = image.getRGB(x, y);
+            int color = previous & 0xff000000 | pixel & 0xffffff;
+            if (previous != color) {
+                image.setRGB(x, y, color);
+                painted[0] = true;
+            }
+        });
+        return canvas.settledAt(dryTicks);
     }
 
     /** Original WoundPainter's nearest parallelogram projection, using the model's real vertex UVs. */

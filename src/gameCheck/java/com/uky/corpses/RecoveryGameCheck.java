@@ -31,6 +31,7 @@ public final class RecoveryGameCheck {
     private static int clientAge, view;
     private static EntityOtherPlayerMP friend;
     private static GuiScreen compassScreen;
+    private static boolean checkedFlight;
 
     public static boolean serverTick(EntityPlayerMP p) throws Exception {
         int n = ++step;
@@ -95,6 +96,10 @@ public final class RecoveryGameCheck {
     public static void clientTick() {
         if (step == 0) return;
         Minecraft mc = Minecraft.getMinecraft();
+        if (!checkedFlight) {
+            checkFlightSneak(mc);
+            checkedFlight = true;
+        }
         if (!compassSeen && step >= 2 && step < 30) {
             if (compassScreen == null) {
                 for (ItemStack stack : mc.thePlayer.inventory.mainInventory)
@@ -169,6 +174,51 @@ public final class RecoveryGameCheck {
                 friend = null;
             }
             restored = true;
+        }
+    }
+
+    private static void checkFlightSneak(Minecraft mc) {
+        net.minecraft.client.entity.EntityPlayerSP player = mc.thePlayer;
+        net.minecraft.util.MovementInput previous = player.movementInput;
+        boolean flight = player.capabilities.isFlying, noClip = player.noClip;
+        float ySize = player.ySize;
+        com.uky.corpses.client.CrouchClient crouch = new com.uky.corpses.client.CrouchClient();
+        cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent tick = new cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent(
+            cpw.mods.fml.common.gameevent.TickEvent.Phase.START,
+            player);
+        int x = net.minecraft.util.MathHelper.floor_double(player.posX);
+        int y = net.minecraft.util.MathHelper.floor_double(player.boundingBox.minY + 1.6);
+        int z = net.minecraft.util.MathHelper.floor_double(player.posZ);
+        net.minecraft.block.Block oldBlock = mc.theWorld.getBlock(x, y, z);
+        int oldMeta = mc.theWorld.getBlockMetadata(x, y, z);
+        try {
+            mc.theWorld.setBlock(x, y, z, Blocks.stone);
+            player.movementInput = new net.minecraft.util.MovementInputFromOptions(mc.gameSettings);
+            player.movementInput.sneak = true;
+            crouch.onTick(tick);
+            check(
+                player.movementInput.getClass() != net.minecraft.util.MovementInputFromOptions.class,
+                "Low ceiling initially holds sneak for a walking player");
+            player.capabilities.isFlying = true;
+            player.noClip = true;
+            crouch.onTick(tick);
+            check(
+                player.height == Downed.TALL
+                    && player.movementInput.getClass() == net.minecraft.util.MovementInputFromOptions.class
+                    && !player.movementInput.sneak,
+                "Flight inside blocks releases held sneak");
+            player.movementInput.sneak = true;
+            crouch.onTick(tick);
+            check(
+                player.height == Downed.TALL && player.movementInput.sneak,
+                "Shift during flight leaves descent input to Minecraft");
+        } finally {
+            mc.theWorld.setBlock(x, y, z, oldBlock, oldMeta, 3);
+            player.movementInput = previous;
+            player.capabilities.isFlying = flight;
+            player.noClip = noClip;
+            player.ySize = ySize;
+            com.uky.corpses.movement.Crouch.set(player, false);
         }
     }
 

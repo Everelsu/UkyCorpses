@@ -37,6 +37,10 @@ public final class WoundCanvasCheck {
                 100,
                 new Random(712));
             int[] fresh = canvas.pixels(100, 200, 0), aged = canvas.pixels(400, 200, 0);
+            long settled = canvas.settledAt(200);
+            assert settled >= 300 && Arrays.equals(
+                canvas.pixels(settled, 200, 0),
+                canvas.pixels(settled + 200, 200, 0)) : "A settled wound can share a texture across ticks";
             assert canvas.count > 0 : "empty original wound " + category;
             assert fresh[16 * 64 + 32] == 0 : "wound painted transparent skin";
             assert Arrays.stream(canvas.pixels(400, 200, 1))

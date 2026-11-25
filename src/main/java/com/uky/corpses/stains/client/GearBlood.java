@@ -294,13 +294,15 @@ public final class GearBlood {
     }
 
     public static void drawHeld(ItemStack stack) {
+        if (stack.getItem() instanceof ItemBlock) return;
         ResourceLocation texture = overlay(stack);
         if (texture == null) return;
         org.lwjgl.opengl.GL11.glPushAttrib(
             org.lwjgl.opengl.GL11.GL_ENABLE_BIT | org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT
                 | org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT
                 | org.lwjgl.opengl.GL11.GL_CURRENT_BIT
-                | org.lwjgl.opengl.GL11.GL_POLYGON_BIT);
+                | org.lwjgl.opengl.GL11.GL_POLYGON_BIT
+                | org.lwjgl.opengl.GL11.GL_TEXTURE_BIT);
         try {
             org.lwjgl.opengl.GL11.glEnable(org.lwjgl.opengl.GL11.GL_BLEND);
             org.lwjgl.opengl.GL11
@@ -342,7 +344,8 @@ public final class GearBlood {
             org.lwjgl.opengl.GL11.GL_ENABLE_BIT | org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT
                 | org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT
                 | org.lwjgl.opengl.GL11.GL_CURRENT_BIT
-                | org.lwjgl.opengl.GL11.GL_POLYGON_BIT);
+                | org.lwjgl.opengl.GL11.GL_POLYGON_BIT
+                | org.lwjgl.opengl.GL11.GL_TEXTURE_BIT);
         try {
             org.lwjgl.opengl.GL11.glEnable(org.lwjgl.opengl.GL11.GL_BLEND);
             org.lwjgl.opengl.GL11
@@ -354,7 +357,7 @@ public final class GearBlood {
             Minecraft.getMinecraft()
                 .getTextureManager()
                 .bindTexture(texture);
-            itemQuad(x, y, 16, 16, 150);
+            itemQuad(x, y, 16, 16, 0);
         } finally {
             org.lwjgl.opengl.GL11.glPopAttrib();
         }

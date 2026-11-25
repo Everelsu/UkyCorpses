@@ -159,6 +159,7 @@ public class EntityCorpse extends Entity implements IInventory, IEntityAdditiona
 
     private long lastRagSequence = -1;
     private int ragPacketAt, ragPacketInterval = 4, ragServerTick;
+    private final double[] ragTorsoPosition = new double[3];
     private int dragPart = Skeleton.HEAD, interactionPart = Skeleton.BODY, walkPushAt;
     private float ragImpact;
     private boolean voidFloor;
@@ -171,9 +172,12 @@ public class EntityCorpse extends Entity implements IInventory, IEntityAdditiona
     public Skeleton.Shape physicalShape(float partial) {
         if (ragdoll != null) ragdoll.hideParts(ampHiddenMask());
         if (ragdoll == null) return null;
-        if (worldObj.isRemote)
-            partial = MathHelper.clamp_float((ticksExisted - ragPacketAt + partial) / ragPacketInterval, 0, 1);
+        if (worldObj.isRemote) partial = ragFraction(partial);
         return ragdoll.shape(partial, ragX - posX, ragY - posY, ragZ - posZ);
+    }
+
+    private float ragFraction(float partial) {
+        return MathHelper.clamp_float((ticksExisted - ragPacketAt + partial) / ragPacketInterval, 0, 1);
     }
 
     /** The body as it lies (both sides: hitboxes); remade when what it depends on changes. */
@@ -1286,9 +1290,8 @@ public class EntityCorpse extends Entity implements IInventory, IEntityAdditiona
     }
 
     private void followPhysicalTorso() {
-        Skeleton.Shape physical = ragdoll.shape(1, 0, 0, 0);
-        double[] at = physical.parts[Skeleton.BODY].apply(0, 6, 0, new double[3]);
-        setPosition(ragX + at[0], ragY + at[1], ragZ + at[2]);
+        ragdoll.torsoPosition(ragTorsoPosition);
+        setPosition(ragX + ragTorsoPosition[0], ragY + ragTorsoPosition[1], ragZ + ragTorsoPosition[2]);
     }
 
     private void sendRagdoll() {
@@ -1362,8 +1365,8 @@ public class EntityCorpse extends Entity implements IInventory, IEntityAdditiona
             || (severed & ~61) != 0) return;
         boolean first = ragdoll == null || Math.abs(ragX - x) + Math.abs(ragY - y) + Math.abs(ragZ - z) > 8;
         if (first) ragdoll = new Ragdoll(state, severed);
-        else ragdoll.applyState(state, severed);
-        ragPacketInterval = first ? 4 : Math.max(1, Math.min(20, serverTick - ragServerTick));
+        else ragdoll.applyState(state, severed, ragFraction(0));
+        ragPacketInterval = first ? 4 : Math.max(1, Math.min(4, serverTick - ragServerTick));
         ragPacketAt = ticksExisted;
         ragServerTick = serverTick;
         lastRagSequence = sequence;
@@ -1388,14 +1391,17 @@ public class EntityCorpse extends Entity implements IInventory, IEntityAdditiona
         buf.writeLong(physicalLife);
         buf.writeLong(ragGeneration)
             .writeBoolean(ragdoll != null);
-        if (ragdoll == null) return;
-        buf.writeDouble(ragX)
-            .writeDouble(ragY)
-            .writeDouble(ragZ)
-            .writeByte(ragdoll.severed())
-            .writeLong(ragSequence)
-            .writeInt(ticksExisted);
-        for (float value : ragdoll.state()) buf.writeFloat(value);
+        if (ragdoll != null) {
+            buf.writeDouble(ragX)
+                .writeDouble(ragY)
+                .writeDouble(ragZ)
+                .writeByte(ragdoll.severed())
+                .writeLong(ragSequence)
+                .writeInt(ticksExisted);
+            for (float value : ragdoll.state()) buf.writeFloat(value);
+        }
+        buf.writeLong(getUniqueID().getMostSignificantBits());
+        buf.writeLong(getUniqueID().getLeastSignificantBits());
     }
 
     @Override
@@ -1406,14 +1412,17 @@ public class EntityCorpse extends Entity implements IInventory, IEntityAdditiona
         if (hasOwner) ownerId = new UUID(buf.readLong(), buf.readLong());
         physicalLife = buf.readLong();
         ragGeneration = buf.readLong();
-        if (!buf.readBoolean() || buf.readableBytes() < 8 * 3 + 1 + 8 + 4 + 78 * 4) return;
-        double x = buf.readDouble(), y = buf.readDouble(), z = buf.readDouble();
-        int mask = buf.readUnsignedByte();
-        long sequence = buf.readLong();
-        int serverTick = buf.readInt();
-        float[] state = new float[78];
-        for (int i = 0; i < state.length; i++) state[i] = buf.readFloat();
-        acceptRagdollSnapshot(ragGeneration, sequence, serverTick, x, y, z, mask, state, 0);
+        if (buf.readBoolean()) {
+            if (buf.readableBytes() < 8 * 3 + 1 + 8 + 4 + 78 * 4) return;
+            double x = buf.readDouble(), y = buf.readDouble(), z = buf.readDouble();
+            int mask = buf.readUnsignedByte();
+            long sequence = buf.readLong();
+            int serverTick = buf.readInt();
+            float[] state = new float[78];
+            for (int i = 0; i < state.length; i++) state[i] = buf.readFloat();
+            acceptRagdollSnapshot(ragGeneration, sequence, serverTick, x, y, z, mask, state, 0);
+        }
+        if (buf.readableBytes() >= 16) entityUniqueID = new UUID(buf.readLong(), buf.readLong());
     }
 
     /** Client: the limb pieces follow the body; same id as the body, so a click on one reaches the server as it. */

@@ -31,6 +31,10 @@ public final class Crouch {
             .register(new Crouch());
     }
 
+    public static boolean bypassCollision(EntityPlayer player) {
+        return player.capabilities.isFlying || player.noClip;
+    }
+
     /** Crouching: 1.5 tall; standing: 1.8 again (callers check there's room). Never touches a box someone else set. */
     public static void set(EntityPlayer p, boolean crouch) {
         float want = crouch ? HEIGHT : Downed.TALL;
@@ -46,6 +50,10 @@ public final class Crouch {
         EntityPlayer p = e.player;
         if (!enabled || e.phase != TickEvent.Phase.END || p.worldObj.isRemote || p.isPlayerSleeping() || Downed.is(p))
             return;
+        if (bypassCollision(p)) {
+            set(p, false);
+            return;
+        }
         if (p.isSneaking()) set(p, true);
         else if (p.height == HEIGHT && Downed.room(p)) set(p, false);
     }

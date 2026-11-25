@@ -591,24 +591,19 @@ final class JoltBridge {
             }
             world.step(.05F, StepQuality.HIGH);
             world.forEachContactPair(pair -> {
+                PhysicsBody bodyA = pair.bodyA(), bodyB = pair.bodyB();
+                Object a = bodyA.getUserPointer(), b = bodyB.getUserPointer();
+                if (!(a instanceof JoltBridge) && !(b instanceof JoltBridge)) return;
                 float strength = 0;
                 for (int i = 0; i < pair.contactCount(); i++) {
                     pair.selectContact(i);
                     strength = Math.max(strength, pair.appliedImpulse() / 80);
                 }
-                Vector3f normal = new Vector3f(), va = previousVelocity(pair.bodyA()),
-                    vb = previousVelocity(pair.bodyB());
+                Vector3f normal = new Vector3f(), va = previousVelocity(bodyA), vb = previousVelocity(bodyB);
                 pair.getNormalOnB(normal);
                 va.sub(vb);
-                float approach = -va.dot(normal), inverseMass = pair.bodyA()
-                    .getInvMass()
-                    + pair.bodyB()
-                        .getInvMass();
+                float approach = -va.dot(normal), inverseMass = bodyA.getInvMass() + bodyB.getInvMass();
                 if (approach > 1.5F && inverseMass > 0) strength = Math.max(strength, approach / inverseMass / 80);
-                Object a = pair.bodyA()
-                    .getUserPointer(),
-                    b = pair.bodyB()
-                        .getUserPointer();
                 if (Math.abs(normal.y) < .5F && approach > 0) {
                     if (a instanceof JoltBridge)
                         ((JoltBridge) a).wallSpeed = Math.max(((JoltBridge) a).wallSpeed, approach);
@@ -620,7 +615,6 @@ final class JoltBridge {
             });
             for (JoltBridge bridge : members) if (!bridge.closed) bridge.pull();
             for (Detached loose : detached) if (!loose.closed) loose.pull();
-            for (Rig rig : rigs) if (!rig.closed) rig.snapshot();
         }
 
         private Vector3f previousVelocity(PhysicsBody body) {

@@ -6,9 +6,7 @@ import java.util.Deque;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderLivingEvent;
@@ -131,53 +129,12 @@ final class ClientHooks {
     }
 
     static void inventoryOverlay(Object value, int x, int y) {
-        if (!(value instanceof ItemStack) || !com.uky.corpses.stains.SurfaceBloodClientConfig.GEAR_HOTBAR.get()) return;
-        ResourceLocation texture = GearBlood.overlay((ItemStack) value);
-        if (texture == null) return;
-        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-        GL11.glPushMatrix();
-        try {
-            Minecraft.getMinecraft()
-                .getTextureManager()
-                .bindTexture(texture);
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            GL11.glDisable(GL11.GL_LIGHTING);
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
-            GL11.glColor4f(1, 1, 1, 1);
-            Tessellator t = Tessellator.instance;
-            t.startDrawingQuads();
-            t.addVertexWithUV(x, y + 16, 0, 0, 1);
-            t.addVertexWithUV(x + 16, y + 16, 0, 1, 1);
-            t.addVertexWithUV(x + 16, y, 0, 1, 0);
-            t.addVertexWithUV(x, y, 0, 0, 0);
-            t.draw();
-        } finally {
-            GL11.glPopMatrix();
-            GL11.glPopAttrib();
-        }
+        if (value instanceof ItemStack) GearBlood.drawGui((ItemStack) value, x, y);
     }
 
     static void heldOverlay(Object value) {
-        if (!(value instanceof ItemStack) || ((ItemStack) value).getItem() instanceof ItemBlock) return;
-        ResourceLocation texture = GearBlood.overlay((ItemStack) value);
-        if (texture == null) return;
-        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-        GL11.glPushMatrix();
-        try {
-            Minecraft.getMinecraft()
-                .getTextureManager()
-                .bindTexture(texture);
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            GL11.glColor4f(1, 1, 1, 1);
-            GL11.glDepthMask(false);
-            // Draw inside the four-argument Forge path, while the original item matrix is still active.
-            GearBlood.drawHeld((ItemStack) value);
-        } finally {
-            GL11.glPopMatrix();
-            GL11.glPopAttrib();
-        }
+        // The Forge item matrix is still active at this hook.
+        if (value instanceof ItemStack) GearBlood.drawHeld((ItemStack) value);
     }
 
     static void firstPersonArm(Object value) {

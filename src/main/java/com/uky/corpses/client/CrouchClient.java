@@ -61,11 +61,17 @@ public final class CrouchClient {
     @SubscribeEvent
     public void onTick(TickEvent.PlayerTickEvent e) {
         Minecraft mc = Minecraft.getMinecraft();
-        if (e.phase != TickEvent.Phase.START || e.player != mc.thePlayer || !Crouch.enabled) return;
+        if (e.phase != TickEvent.Phase.START || e.player != mc.thePlayer) return;
         EntityPlayerSP p = (EntityPlayerSP) e.player;
-        boolean down = Downed.is(p) || p.isPlayerSleeping()
-            || p.movementInput.getClass() != MovementInputFromOptions.class && !(p.movementInput instanceof Held);
-        if (down) { // lying down (or someone else's input): not ours to handle
+        boolean down = Downed.is(p) || p.isPlayerSleeping();
+        boolean bypass = Crouch.bypassCollision(p);
+        if (down || bypass || !Crouch.enabled) {
+            if (p.movementInput instanceof Held) p.movementInput = new MovementInputFromOptions(mc.gameSettings);
+            if (!down && p.height == Crouch.HEIGHT && (bypass || Downed.room(p))) Crouch.set(p, false);
+            drop = lastDrop = 0;
+            return;
+        }
+        if (p.movementInput.getClass() != MovementInputFromOptions.class && !(p.movementInput instanceof Held)) {
             drop = lastDrop = 0;
             return;
         }

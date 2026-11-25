@@ -458,6 +458,11 @@ public final class SurfaceBloodClient {
             int bx = MathHelper.floor_double(s.x - s.face.offsetX * .02),
                 by = MathHelper.floor_double(s.y - s.face.offsetY * .02),
                 bz = MathHelper.floor_double(s.z - s.face.offsetZ * .02);
+            if (world.getBlock(bx, by, bz)
+                .isLeaves(world, bx, by, bz)) {
+                it.remove();
+                continue;
+            }
             Material m = world
                 .getBlock(MathHelper.floor_double(s.x), MathHelper.floor_double(s.y), MathHelper.floor_double(s.z))
                 .getMaterial();
@@ -499,7 +504,9 @@ public final class SurfaceBloodClient {
             }
             if (SurfaceBloodClientConfig.DRIPS.get() && s.face == ForgeDirection.DOWN
                 && s.dry(ticks) < .5
-                && random.nextInt(60) == 0) spray(s.x, s.y - .03, s.z, 0, -.1F, 0, .1F, false);
+                && random.nextInt(60) == 0
+                && StainMesh.supported(world, s))
+                spray(s.x, s.y - .03, s.z, 0, -.1F, 0, .1F, false, new int[] { s.color, s.dried });
             if (!s.soaked && s.surface.through()
                 && SurfaceBloodClientConfig.SOAK_THROUGH.get()
                 && ticks - s.born > SurfaceBloodClientConfig.SOAK_TIME.get() * 20L) {
@@ -610,7 +617,8 @@ public final class SurfaceBloodClient {
 
     @SubscribeEvent
     public void render(RenderWorldLastEvent event) {
-        if (!SurfaceBlood.enabled || world() == null) return;
+        if (!SurfaceBlood.enabled || world() == null
+            || stains.isEmpty() && drops.isEmpty() && bursts.isEmpty() && clouds.isEmpty()) return;
         GL11.glPushAttrib(
             GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT
                 | GL11.GL_DEPTH_BUFFER_BIT

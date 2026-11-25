@@ -20,6 +20,11 @@ import com.uky.corpses.stains.client.decal.StainSprites;
 final class SourceClouds {
 
     private final List<Cloud> clouds = new ArrayList<>();
+
+    boolean isEmpty() {
+        return clouds.isEmpty();
+    }
+
     private final Random random = new Random();
 
     int count() {

@@ -258,9 +258,7 @@ public final class EntityMobRagdoll extends Entity implements IEntityAdditionalS
 
     public PhysTransform[] physicalTransforms(float partial) {
         if (state == null) return new PhysTransform[0];
-        float alpha = worldObj.isRemote
-            ? Math.max(0, Math.min(1, (worldObj.getTotalWorldTime() - receivedAt + partial) / 2F))
-            : Math.max(0, Math.min(1, partial));
+        float alpha = worldObj.isRemote ? snapshotFraction(partial) : Math.max(0, Math.min(1, partial));
         float[] old = before == null || before.length != state.length ? state : before;
         PhysTransform[] result = new PhysTransform[state.length / 13];
         for (int i = 0; i < result.length; i++) {
@@ -281,6 +279,10 @@ public final class EntityMobRagdoll extends Entity implements IEntityAdditionalS
         return result;
     }
 
+    private float snapshotFraction(float partial) {
+        return Math.max(0, Math.min(1, (worldObj.getTotalWorldTime() - receivedAt + partial) / 2F));
+    }
+
     public void acceptSnapshot(long life, long order, int serverAge, double x, double y, double z, float[] incoming) {
         if (!worldObj.isRemote || generation != life
             || order <= lastSequence
@@ -289,12 +291,36 @@ public final class EntityMobRagdoll extends Entity implements IEntityAdditionalS
             || !RagdollWorld.RigScene.validState(incoming)
             || state != null && state.length != incoming.length) return;
         if (originX != x || originY != y || originZ != z) return;
-        before = state == null ? incoming.clone() : state;
+        if (state == null) before = incoming.clone();
+        else {
+            float alpha = snapshotFraction(0);
+            if (before == null || alpha >= 1) before = state;
+            else {
+                Quat4f start = new Quat4f(), end = new Quat4f();
+                for (int offset = 0; offset < state.length; offset += 13) {
+                    for (int axis = 0; axis < 3; axis++) {
+                        int index = offset + axis;
+                        before[index] += (state[index] - before[index]) * alpha;
+                    }
+                    start.set(before[offset + 3], before[offset + 4], before[offset + 5], before[offset + 6]);
+                    end.set(state[offset + 3], state[offset + 4], state[offset + 5], state[offset + 6]);
+                    start.interpolate(end, alpha);
+                    start.normalize();
+                    before[offset + 3] = start.x;
+                    before[offset + 4] = start.y;
+                    before[offset + 5] = start.z;
+                    before[offset + 6] = start.w;
+                }
+            }
+        }
         state = incoming.clone();
         lastSequence = order;
         age = serverAge;
         receivedAt = worldObj.getTotalWorldTime();
         setPosition(originX + state[0], originY + state[1], originZ + state[2]);
+        lastTickPosX = prevPosX = posX;
+        lastTickPosY = prevPosY = posY;
+        lastTickPosZ = prevPosZ = posZ;
     }
 
     @Override

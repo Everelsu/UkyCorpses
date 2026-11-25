@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
@@ -27,7 +28,8 @@ public final class RagdollWorld {
         List<double[]> local = new ArrayList<>();
         // Detached limbs can travel apart: query around each part instead of scanning the empty volume between them.
         Skeleton.Shape shape = rig.shape(1, 0, 0, 0);
-        java.util.Set<String> visited = new java.util.HashSet<>();
+        java.util.Set<Long> visited = new java.util.HashSet<>();
+        List<AxisAlignedBB> boxes = new ArrayList<>();
         for (int part = 0; part < Skeleton.PARTS; part++) {
             if (rig.absent(part)) continue;
             double[] p = shape.bounds(part);
@@ -44,10 +46,10 @@ public final class RagdollWorld {
                 for (int y = Math.max(0, MathHelper.floor_double(area.minY)); y
                     <= Math.min(255, MathHelper.floor_double(area.maxY)); y++)
                     for (int z = MathHelper.floor_double(area.minZ); z <= MathHelper.floor_double(area.maxZ); z++) {
-                        if (!world.blockExists(x, y, z) || !visited.add(x + ":" + y + ":" + z)) continue;
+                        if (!visited.add(blockKey(x, y, z)) || !world.blockExists(x, y, z)) continue;
                         Block block = world.getBlock(x, y, z);
-                        if (block instanceof BlockCorpse) continue;
-                        List<AxisAlignedBB> boxes = new ArrayList<>();
+                        if (block == Blocks.air || block instanceof BlockCorpse) continue;
+                        boxes.clear();
                         try {
                             block.addCollisionBoxesToList(world, x, y, z, area, boxes, exclude);
                         } catch (RuntimeException error) {
@@ -61,6 +63,10 @@ public final class RagdollWorld {
                     }
         }
         rig.terrain(local);
+    }
+
+    static long blockKey(int x, int y, int z) {
+        return (x & 0x3ffffffL) << 34 | (z & 0x3ffffffL) << 8 | y;
     }
 
     /** A single detached part sharing the same Jolt world and terrain references as every ragdoll. */
@@ -98,14 +104,15 @@ public final class RagdollWorld {
                 position[1] + margin + Math.max(0, dy),
                 position[2] + margin + Math.max(0, dz));
             List<double[]> boxes = new ArrayList<>();
+            List<AxisAlignedBB> colliders = new ArrayList<>();
             for (int x = MathHelper.floor_double(area.minX); x <= MathHelper.floor_double(area.maxX); x++)
                 for (int y = Math.max(0, MathHelper.floor_double(area.minY)); y
                     <= Math.min(255, MathHelper.floor_double(area.maxY)); y++)
                     for (int z = MathHelper.floor_double(area.minZ); z <= MathHelper.floor_double(area.maxZ); z++) {
                         if (!world.blockExists(x, y, z)) continue;
                         Block block = world.getBlock(x, y, z);
-                        if (block instanceof BlockCorpse) continue;
-                        List<AxisAlignedBB> colliders = new ArrayList<>();
+                        if (block == Blocks.air || block instanceof BlockCorpse) continue;
+                        colliders.clear();
                         try {
                             block.addCollisionBoxesToList(world, x, y, z, area, colliders, exclude);
                         } catch (RuntimeException badShape) {
@@ -185,7 +192,8 @@ public final class RagdollWorld {
 
         public void refresh(Entity exclude) {
             java.util.List<double[]> boxes = new java.util.ArrayList<>();
-            java.util.Set<String> visited = new java.util.HashSet<>();
+            java.util.Set<Long> visited = new java.util.HashSet<>();
+            List<AxisAlignedBB> colliders = new ArrayList<>();
             javax.vecmath.Vector3f low = new javax.vecmath.Vector3f(), high = new javax.vecmath.Vector3f(),
                 velocity = new javax.vecmath.Vector3f();
             for (com.uky.corpses.port.physics.PhysicsBody body : rig.parts) if (body != null && !body.isStatic()) {
@@ -204,10 +212,10 @@ public final class RagdollWorld {
                         <= Math.min(255, MathHelper.floor_double(area.maxY)); by++)
                         for (int bz = MathHelper.floor_double(area.minZ); bz
                             <= MathHelper.floor_double(area.maxZ); bz++) {
-                                if (!world.blockExists(bx, by, bz) || !visited.add(bx + ":" + by + ":" + bz)) continue;
+                                if (!visited.add(blockKey(bx, by, bz)) || !world.blockExists(bx, by, bz)) continue;
                                 Block block = world.getBlock(bx, by, bz);
-                                if (block instanceof BlockCorpse) continue;
-                                java.util.List<AxisAlignedBB> colliders = new java.util.ArrayList<>();
+                                if (block == Blocks.air || block instanceof BlockCorpse) continue;
+                                colliders.clear();
                                 try {
                                     block.addCollisionBoxesToList(world, bx, by, bz, area, colliders, exclude);
                                 } catch (RuntimeException error) {

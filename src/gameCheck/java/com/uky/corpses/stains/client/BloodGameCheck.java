@@ -47,6 +47,7 @@ public final class BloodGameCheck {
             }
             check(different(bloody, clean) > 8, "First-person Forge sword geometry actually renders its blood");
             prints();
+            leafCanopy(mc);
             mc.theWorld.doPreChunk(40, 40, true);
             mc.theWorld.setBlock(648, 64, 648, net.minecraft.init.Blocks.stone);
             distant = new Stain();
@@ -110,6 +111,44 @@ public final class BloodGameCheck {
         }
         UkyCorpses.LOG.info("BLOODQA completed: sword, skin texture, fresh-splatter footprints and supported mesh");
         return true;
+    }
+
+    private static void leafCanopy(Minecraft mc) {
+        mc.theWorld.doPreChunk(39, 39, true);
+        try {
+            mc.theWorld.setBlock(632, 64, 632, net.minecraft.init.Blocks.stone);
+            mc.theWorld.setBlock(632, 66, 632, net.minecraft.init.Blocks.leaves);
+            SourceVoxelCollider collider = new SourceVoxelCollider();
+            check(
+                collider.sweep(mc.theWorld, 632.5, 67.5, 632.5, 632.5, 64.5, 632.5) == SourceVoxelCollider.BLOCK
+                    && collider.hitBlockY == 64
+                    && collider.hitFace == ForgeDirection.UP,
+                "Blood passes through leaves and hits the ground below");
+            Stain underside = StainPlacement.impact(
+                ForgeDirection.DOWN,
+                632.5,
+                66,
+                632.5,
+                0,
+                .25F,
+                0,
+                .04F,
+                0x8E1111,
+                0x4E140E,
+                Surface.PLAIN,
+                mc.theWorld.getTotalWorldTime(),
+                new java.util.Random(1));
+            check(!StainMesh.supported(mc.theWorld, underside), "Stored blood has no drawable face under foliage");
+            mc.theWorld.setBlock(632, 66, 632, net.minecraft.init.Blocks.stone);
+            check(
+                collider.sweep(mc.theWorld, 632.5, 65.5, 632.5, 632.5, 66.5, 632.5) == SourceVoxelCollider.BLOCK
+                    && collider.hitBlockY == 66
+                    && collider.hitFace == ForgeDirection.DOWN
+                    && StainMesh.supported(mc.theWorld, underside),
+                "Solid ceilings still catch blood and support an underside stain");
+        } finally {
+            mc.theWorld.doPreChunk(39, 39, false);
+        }
     }
 
     private static void dump(byte[] pixels, String name) throws Exception {

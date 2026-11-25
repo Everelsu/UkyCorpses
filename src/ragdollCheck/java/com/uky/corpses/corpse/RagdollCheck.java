@@ -103,6 +103,18 @@ public final class RagdollCheck {
         // Network snapshots change only when the server sends one, with normalized interpolation.
         restored.applyState(saved, 0);
         sameShape(rig.shape(1, 0, 0, 0), restored.shape(1, 0, 0, 0));
+        double[] center = new double[3];
+        restored.torsoPosition(center);
+        double[] fromMesh = restored.shape(1, 0, 0, 0).parts[Skeleton.BODY].apply(0, 6, 0, new double[3]);
+        for (int axis = 0; axis < 3; axis++) assert Math.abs(center[axis] - fromMesh[axis]) < .00001;
+        float[] shifted = saved.clone();
+        for (int index = 0; index < shifted.length; index += 13) shifted[index] += 2;
+        restored.applyState(shifted, 0);
+        Skeleton.Shape inFlight = restored.shape(.25F, 0, 0, 0);
+        restored.applyState(saved, 0, .25F);
+        sameShape(inFlight, restored.shape(0, 0, 0, 0));
+        assert RagdollWorld.blockKey(-30000000, 255, 30000000) != RagdollWorld.blockKey(30000000, 255, -30000000);
+        assert RagdollWorld.blockKey(-1, 0, -1) != RagdollWorld.blockKey(-1, 255, -1);
         float[] invalid = saved.clone();
         invalid[3] = Float.NaN;
         assert !Ragdoll.validState(invalid);
